@@ -14,6 +14,7 @@ import {
   InMemoryBatchRepository,
   InMemorySimulationRepository,
   PostgresSimulationRepository,
+  PostgresPlanningStore,
 } from '@PCP/planning-core';
 import type {
   PlanningOrder,
@@ -21,7 +22,14 @@ import type {
   InventoryPosition,
   OrderId,
 } from '@PCP/planning-core';
-import type { ISimulationRepository } from '@PCP/planning-core';
+import type {
+  IOrderRepository,
+  IResourceRepository,
+  IMaterialRepository,
+  IBatchRepository,
+  ISimulationRepository,
+} from '@PCP/planning-core';
+import type { PostgresInventoryStore } from '@PCP/planning-core';
 import {
   ConstraintRegistry,
   ConstraintEngine,
@@ -35,56 +43,84 @@ import { MockPharmaAdapter, createHaeAdapter } from '@PCP/planning-adapters';
 import type { IPlanningAdapter } from '@PCP/planning-adapters';
 import { randomUUID } from 'node:crypto';
 
-function createSimulationRepository(): ISimulationRepository {
-  const dbUrl = process.env['PCP_DATABASE_URL']
+function resolveDatabaseUrl(): string | undefined {
+  return process.env['PCP_DATABASE_URL']
     ?? process.env['ALLOCATION_DATABASE_URL']
     ?? process.env['DATABASE_URL'];
+}
+
+interface PlanningRepositories {
+  orderRepo: IOrderRepository;
+  resourceRepo: IResourceRepository;
+  materialRepo: IMaterialRepository;
+  batchRepo: IBatchRepository;
+  simulationRepo: ISimulationRepository;
+  pgStore: PostgresPlanningStore | null;
+  pgInventory: PostgresInventoryStore | null;
+}
+
+function createRepositories(): PlanningRepositories {
+  const dbUrl = resolveDatabaseUrl();
   if (dbUrl) {
     try {
-      const repo = new PostgresSimulationRepository(dbUrl);
-      console.info('[PlanningService] PostgreSQL simulation repository enabled');
-      return repo;
+      const pgStore = new PostgresPlanningStore(dbUrl);
+      console.info('[PlanningService] PostgreSQL persistence enabled');
+      return {
+        orderRepo: pgStore.orderRepo,
+        resourceRepo: pgStore.resourceRepo,
+        materialRepo: pgStore.materialRepo,
+        batchRepo: pgStore.batchRepo,
+        simulationRepo: new PostgresSimulationRepository(pgStore.pool),
+        pgStore,
+        pgInventory: pgStore.inventoryStore,
+      };
     } catch (err) {
-      console.warn('[PlanningService] PostgreSQL simulation repo failed, using in-memory:', String(err));
+      console.warn('[PlanningService] PostgreSQL init failed, using in-memory:', String(err));
     }
   }
-  return new InMemorySimulationRepository();
+
+  return {
+    orderRepo: new InMemoryOrderRepository(),
+    resourceRepo: new InMemoryResourceRepository(),
+    materialRepo: new InMemoryMaterialRepository(),
+    batchRepo: new InMemoryBatchRepository(),
+    simulationRepo: new InMemorySimulationRepository(),
+    pgStore: null,
+    pgInventory: null,
+  };
 }
 
 export class PlanningService {
-  readonly orderRepo = new InMemoryOrderRepository();
-  readonly resourceRepo = new InMemoryResourceRepository();
-  readonly materialRepo = new InMemoryMaterialRepository();
-  readonly batchRepo = new InMemoryBatchRepository();
+  readonly orderRepo: IOrderRepository;
+  readonly resourceRepo: IResourceRepository;
+  readonly materialRepo: IMaterialRepository;
+  readonly batchRepo: IBatchRepository;
   readonly simulationRepo: ISimulationRepository;
   readonly registry = new ConstraintRegistry();
   readonly engine: ConstraintEngine;
 
-  /** In-memory inventory store – keyed by `materialId::locationId` */
+  private readonly pgInventory: PostgresInventoryStore | null;
   private readonly inventoryStore = new Map<string, InventoryPosition>();
-
   private readonly adapters = new Map<string, IPlanningAdapter>();
 
-  constructor() {
-    this.simulationRepo = createSimulationRepository();
+  constructor(repos: PlanningRepositories = createRepositories()) {
+    this.orderRepo = repos.orderRepo;
+    this.resourceRepo = repos.resourceRepo;
+    this.materialRepo = repos.materialRepo;
+    this.batchRepo = repos.batchRepo;
+    this.simulationRepo = repos.simulationRepo;
+    this.pgInventory = repos.pgInventory;
 
-    // Register built-in generic constraints
     this.registry.register(new AtpAvailabilityConstraint());
     this.registry.register(new ResourceCapacityConstraint());
     this.registry.register(new RemainingShelfLifeConstraint());
-
-    // Register pharma pack
     this.registry.registerMany(pharmaConstraints);
-
-    // Register CGT pack
     this.registry.registerMany(cgtConstraints);
 
     this.engine = new ConstraintEngine(this.registry);
 
-    // Register known adapters
     this.adapters.set('mock.pharma', new MockPharmaAdapter());
 
-    // Register HAE adapter if database URL is configured
     const haeDbUrl = process.env['ALLOCATION_DATABASE_URL'] ?? process.env['DATABASE_URL'];
     if (haeDbUrl) {
       try {
@@ -95,6 +131,17 @@ export class PlanningService {
         console.warn('[PlanningService] HAE adapter could not be initialized:', String(err));
       }
     }
+  }
+
+  private inventoryKey(pos: InventoryPosition): string {
+    return `${pos.materialId}::${pos.locationId}`;
+  }
+
+  private async getInventory(): Promise<InventoryPosition[]> {
+    if (this.pgInventory) {
+      return this.pgInventory.loadAll();
+    }
+    return Array.from(this.inventoryStore.values());
   }
 
   async loadFromAdapter(adapterId: string): Promise<{ loaded: number; adapter: string; breakdown: Record<string, number> }> {
@@ -111,7 +158,6 @@ export class PlanningService {
       adapter.fetchInventory().catch(() => []),
     ]);
 
-    // Persist into repositories
     await Promise.all([
       this.orderRepo.saveMany(orders),
       ...resources.map(r => this.resourceRepo.save(r)),
@@ -119,10 +165,13 @@ export class PlanningService {
       ...batches.map(b => this.batchRepo.save(b)),
     ]);
 
-    // Upsert inventory positions (keyed by material + location)
-    for (const pos of inventory) {
-      const key = `${pos.materialId}::${pos.locationId}`;
-      this.inventoryStore.set(key, pos);
+    if (this.pgInventory) {
+      await this.pgInventory.replaceAll(inventory);
+    } else {
+      this.inventoryStore.clear();
+      for (const pos of inventory) {
+        this.inventoryStore.set(this.inventoryKey(pos), pos);
+      }
     }
 
     console.info(
@@ -157,13 +206,12 @@ export class PlanningService {
         ? allOrders.filter(o => opts.orderIds!.includes(o.id))
         : allOrders;
 
-    const [resources, batches, materials] = await Promise.all([
+    const [resources, batches, materials, inventory] = await Promise.all([
       this.resourceRepo.findAll(),
       this.batchRepo.findAll(),
       this.materialRepo.findAll(),
+      this.getInventory(),
     ]);
-
-    const inventory = Array.from(this.inventoryStore.values());
 
     const output = await this.engine.evaluate({
       orders,
@@ -179,7 +227,6 @@ export class PlanningService {
       ...(opts.triggeredBy ? { triggeredBy: opts.triggeredBy } : {}),
     });
 
-    // Persist updated scheduling status on orders
     await Promise.all(
       output.results.map(result => {
         const base = orders.find(o => o.id === result.orderId)!;

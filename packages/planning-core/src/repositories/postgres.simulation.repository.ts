@@ -7,16 +7,9 @@
 import pg from 'pg';
 import type { SimulationRun, SimRunId } from '../types/canonical.types.js';
 import type { ISimulationRepository } from '../interfaces/repository.interface.js';
+import { PCP_SCHEMA_SQL } from './postgres.planning.repositories.js';
 
-const CREATE_TABLE_SQL = `
-CREATE TABLE IF NOT EXISTS pcp_simulation_runs (
-  id UUID PRIMARY KEY,
-  payload JSONB NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-CREATE INDEX IF NOT EXISTS idx_pcp_simulation_runs_created
-  ON pcp_simulation_runs (created_at DESC);
-`;
+const CREATE_TABLE_SQL = PCP_SCHEMA_SQL;
 
 interface StoredPayload {
   id: string;
@@ -46,8 +39,10 @@ export class PostgresSimulationRepository implements ISimulationRepository {
   private readonly pool: pg.Pool;
   private initialized = false;
 
-  constructor(connectionString: string) {
-    this.pool = new pg.Pool({ connectionString });
+  constructor(connectionStringOrPool: string | pg.Pool) {
+    this.pool = typeof connectionStringOrPool === 'string'
+      ? new pg.Pool({ connectionString: connectionStringOrPool })
+      : connectionStringOrPool;
   }
 
   private async ensureSchema(): Promise<void> {

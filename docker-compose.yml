@@ -12,6 +12,7 @@ services:
     environment:
       - PORT=3100
       - NODE_ENV=production
+      - PCP_DATABASE_URL=postgresql://opp:opp_dev_password@postgres:5432/opp
     depends_on:
       - postgres
       - redis

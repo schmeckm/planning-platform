@@ -87,3 +87,42 @@ CREATE TABLE IF NOT EXISTS constraint_results (
 CREATE INDEX IF NOT EXISTS idx_constraint_results_order ON constraint_results (order_id);
 CREATE INDEX IF NOT EXISTS idx_constraint_results_run ON constraint_results (sim_run_id);
 CREATE INDEX IF NOT EXISTS idx_constraint_results_passed ON constraint_results (passed, severity);
+
+-- ─── PCP JSONB runtime stores (shadow planning persistence) ───────────────────
+CREATE TABLE IF NOT EXISTS pcp_simulation_runs (
+    id            UUID PRIMARY KEY,
+    payload       JSONB NOT NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_pcp_simulation_runs_created
+    ON pcp_simulation_runs (created_at DESC);
+
+CREATE TABLE IF NOT EXISTS pcp_orders (
+    id            TEXT PRIMARY KEY,
+    payload       JSONB NOT NULL,
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS pcp_resources (
+    id            TEXT PRIMARY KEY,
+    payload       JSONB NOT NULL,
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS pcp_materials (
+    id            TEXT PRIMARY KEY,
+    payload       JSONB NOT NULL,
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS pcp_batches (
+    id            TEXT PRIMARY KEY,
+    payload       JSONB NOT NULL,
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS pcp_inventory (
+    id            TEXT PRIMARY KEY,
+    payload       JSONB NOT NULL,
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
