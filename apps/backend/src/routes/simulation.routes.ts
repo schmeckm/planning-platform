@@ -55,7 +55,7 @@ simulationRouter.post('/', async (req, res, next) => {
   }
 });
 
-/** Load data from an adapter into the in-memory context. */
+/** Load data from an adapter into the planning repositories. */
 simulationRouter.post('/load-adapter', async (req, res, next) => {
   try {
     const { adapterId } = LoadAdapterSchema.parse(req.body);

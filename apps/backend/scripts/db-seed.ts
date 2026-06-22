@@ -1,25 +1,46 @@
 /**
- * Seed canonical planning data via the mock pharma adapter.
+ * Seed canonical planning data from an adapter into PostgreSQL.
  *
  * Usage:
  *   pnpm --filter @PCP/backend db:seed
+ *   pnpm --filter @PCP/backend db:seed -- --adapter=hae.postgres
  */
 
 import { PostgresPlanningStore } from '@PCP/planning-core';
-import { MockPharmaAdapter } from '@PCP/planning-adapters';
+import { MockPharmaAdapter, createHaeAdapter } from '@PCP/planning-adapters';
+import type { IPlanningAdapter } from '@PCP/planning-adapters';
 
-function resolveDatabaseUrl(): string {
-  return process.env['PCP_DATABASE_URL']
-    ?? process.env['DATABASE_URL']
-    ?? 'postgresql://opp:opp_dev_password@localhost:5432/opp';
+function resolveOppDatabaseUrl(): string {
+  const url = process.env['PCP_DATABASE_URL'];
+  if (!url) {
+    throw new Error('PCP_DATABASE_URL is required for db:seed (OPP shadow database).');
+  }
+  return url;
+}
+
+function parseArgs(argv: string[]): { adapterId: string } {
+  const adapterArg = argv.find((arg) => arg.startsWith('--adapter='));
+  return { adapterId: adapterArg?.slice('--adapter='.length) ?? 'mock.pharma' };
+}
+
+function resolveAdapter(adapterId: string): IPlanningAdapter {
+  switch (adapterId) {
+    case 'mock.pharma':
+      return new MockPharmaAdapter();
+    case 'hae.postgres':
+      return createHaeAdapter();
+    default:
+      throw new Error(`Unknown adapter "${adapterId}". Use mock.pharma or hae.postgres.`);
+  }
 }
 
 async function main(): Promise<void> {
-  const dbUrl = resolveDatabaseUrl();
+  const { adapterId } = parseArgs(process.argv.slice(2));
+  const dbUrl = resolveOppDatabaseUrl();
   const store = new PostgresPlanningStore(dbUrl);
   await store.ensureSchema();
 
-  const adapter = new MockPharmaAdapter();
+  const adapter = resolveAdapter(adapterId);
   const [orders, resources, materials, batches, inventory] = await Promise.all([
     adapter.fetchOrders(),
     adapter.fetchResources(),
@@ -36,7 +57,7 @@ async function main(): Promise<void> {
   ]);
   await store.inventoryStore.replaceAll(inventory);
 
-  console.info('[db:seed] Loaded mock pharma data into PostgreSQL');
+  console.info(`[db:seed] Loaded "${adapter.metadata.name}" (${adapterId}) into PostgreSQL`);
   console.info(
     `  orders=${orders.length} resources=${resources.length} ` +
     `materials=${materials.length} batches=${batches.length} inventory=${inventory.length}`,

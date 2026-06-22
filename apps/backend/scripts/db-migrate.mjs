@@ -11,16 +11,18 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const oppRoot = path.resolve(__dirname, '../..');
+const oppRoot = path.resolve(__dirname, '../../..');
 
-function resolveDatabaseUrl() {
-  return process.env['PCP_DATABASE_URL']
-    ?? process.env['DATABASE_URL']
-    ?? 'postgresql://opp:opp_dev_password@localhost:5432/opp';
+function resolveOppDatabaseUrl() {
+  const url = process.env['PCP_DATABASE_URL'];
+  if (!url) {
+    throw new Error('PCP_DATABASE_URL is required for db:migrate.');
+  }
+  return url;
 }
 
 async function main() {
-  const dbUrl = resolveDatabaseUrl();
+  const dbUrl = resolveOppDatabaseUrl();
   const initSqlPath = path.join(oppRoot, 'docker/postgres/init.sql');
   const sql = fs.readFileSync(initSqlPath, 'utf8');
 

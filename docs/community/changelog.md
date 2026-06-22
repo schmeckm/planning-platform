@@ -23,6 +23,17 @@ For readable release stories, see [Release Notes](/community/release-notes/).
 
 ### Added
 
+- PostgreSQL persistence for planning entities (`pcp_orders`, `pcp_resources`, `pcp_materials`, `pcp_batches`, `pcp_inventory`, `pcp_simulation_runs`)
+- `pnpm --filter @PCP/backend db:migrate` and `db:seed` (supports `--adapter=mock.pharma|hae.postgres`)
+- Health endpoint reports `persistence: postgresql | in-memory`
+- Integration tests for Postgres repositories (when `PCP_DATABASE_URL` is set)
+
+### Changed
+
+- `PCP_DATABASE_URL` and `ALLOCATION_DATABASE_URL` are strictly separated (OPP shadow vs HAE read adapter)
+
+### Added (prior unreleased)
+
 - `@PCP/planning-shopfloor` — operational module for live line transparency (MQTT ingest, shadow message store, board aggregation)
 - PCP API routes `/api/pcp/v1/shopfloor/*` with `HaeShopfloorProvider` bridge to HAE backend
 - Documentation: [Shopfloor Transparency Module](/modules/shopfloor) (EN + DE)

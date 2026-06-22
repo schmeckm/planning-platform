@@ -50,11 +50,20 @@ This starts:
 ### 4. Initialize the Database
 
 ```bash
+cp apps/backend/.env.example apps/backend/.env
 pnpm --filter @PCP/backend db:migrate
 pnpm --filter @PCP/backend db:seed
+# optional verification:
+pnpm --filter @PCP/backend verify:persistence
 ```
 
-The seed command loads sample pharma mock data: orders, resources, batches, and calendars.
+The seed command loads sample pharma mock data into the **OPP shadow database** (`PCP_DATABASE_URL`).
+
+To load from the HAE plant database instead (requires `ALLOCATION_DATABASE_URL`):
+
+```bash
+pnpm --filter @PCP/backend db:seed -- --adapter=hae.postgres
+```
 
 ### 5. Start the API
 

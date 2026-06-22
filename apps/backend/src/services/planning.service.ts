@@ -43,10 +43,12 @@ import { MockPharmaAdapter, createHaeAdapter } from '@PCP/planning-adapters';
 import type { IPlanningAdapter } from '@PCP/planning-adapters';
 import { randomUUID } from 'node:crypto';
 
-function resolveDatabaseUrl(): string | undefined {
-  return process.env['PCP_DATABASE_URL']
-    ?? process.env['ALLOCATION_DATABASE_URL']
-    ?? process.env['DATABASE_URL'];
+function resolveOppDatabaseUrl(): string | undefined {
+  return process.env['PCP_DATABASE_URL'];
+}
+
+function resolveHaeDatabaseUrl(): string | undefined {
+  return process.env['ALLOCATION_DATABASE_URL'];
 }
 
 interface PlanningRepositories {
@@ -60,7 +62,7 @@ interface PlanningRepositories {
 }
 
 function createRepositories(): PlanningRepositories {
-  const dbUrl = resolveDatabaseUrl();
+  const dbUrl = resolveOppDatabaseUrl();
   if (dbUrl) {
     try {
       const pgStore = new PostgresPlanningStore(dbUrl);
@@ -121,7 +123,7 @@ export class PlanningService {
 
     this.adapters.set('mock.pharma', new MockPharmaAdapter());
 
-    const haeDbUrl = process.env['ALLOCATION_DATABASE_URL'] ?? process.env['DATABASE_URL'];
+    const haeDbUrl = resolveHaeDatabaseUrl();
     if (haeDbUrl) {
       try {
         const haeAdapter = createHaeAdapter(haeDbUrl);

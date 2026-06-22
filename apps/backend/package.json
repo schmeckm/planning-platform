@@ -12,7 +12,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "db:migrate": "node scripts/db-migrate.mjs",
-    "db:seed": "tsx scripts/db-seed.ts"
+    "db:seed": "tsx scripts/db-seed.ts",
+    "verify:persistence": "node scripts/db-migrate.mjs && tsx scripts/db-seed.ts && tsx scripts/verify-persistence.ts"
   },
   "dependencies": {
     "@PCP/planning-core": "workspace:*",
