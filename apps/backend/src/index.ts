@@ -12,6 +12,10 @@
 
 
 
+import { loadBackendEnv } from '../scripts/load-backend-env.mjs';
+
+loadBackendEnv({ override: process.env['NODE_ENV'] !== 'production' });
+
 import express from 'express';
 
 import cors from 'cors';

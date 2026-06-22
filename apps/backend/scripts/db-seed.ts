@@ -6,9 +6,12 @@
  *   pnpm --filter @PCP/backend db:seed -- --adapter=hae.postgres
  */
 
+import { loadBackendEnv } from './load-backend-env.mjs';
 import { PostgresPlanningStore } from '@PCP/planning-core';
 import { MockPharmaAdapter, createHaeAdapter, createSapS4Adapter, createErpNextAdapter } from '@PCP/planning-adapters';
 import type { IPlanningAdapter } from '@PCP/planning-adapters';
+
+loadBackendEnv({ override: true });
 
 function resolveOppDatabaseUrl(): string {
   const url = process.env['PCP_DATABASE_URL'];

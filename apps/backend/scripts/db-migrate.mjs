@@ -9,6 +9,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { loadBackendEnv } from './load-backend-env.mjs';
+
+loadBackendEnv({ override: true });
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const oppRoot = path.resolve(__dirname, '../../..');

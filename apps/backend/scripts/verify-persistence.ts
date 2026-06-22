@@ -4,10 +4,13 @@
  * Requires PCP_DATABASE_URL and prior db:seed.
  */
 
+import { loadBackendEnv } from './load-backend-env.mjs';
 import { PostgresPlanningStore } from '@PCP/planning-core';
 import { PostgresSimulationRepository } from '@PCP/planning-core';
 import { randomUUID } from 'node:crypto';
 import { asSimRunId } from '@PCP/planning-core';
+
+loadBackendEnv({ override: true });
 
 function resolveOppDatabaseUrl(): string {
   const url = process.env['PCP_DATABASE_URL'];
