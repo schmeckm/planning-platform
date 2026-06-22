@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.tsbuildinfo
+
+# VitePress build cache
+docs/.vitepress/cache/
+docs/.vitepress/.temp/
+
+# Vendor sync copies (use submodules or pnpm sync:vendor locally)
+vendor/cockpit/
+vendor/portal/
+vendor/styles/
+vendor/config/
+vendor/process-definitions/

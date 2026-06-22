@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../../packages/planning-core" },
+    { "path": "../../packages/planning-constraints" },
+    { "path": "../../packages/planning-pharma" },
+    { "path": "../../packages/planning-cgt" },
+    { "path": "../../packages/planning-adapters" },
+    { "path": "../../packages/planning-shopfloor" }
+  ]
+}

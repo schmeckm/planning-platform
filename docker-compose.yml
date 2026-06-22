@@ -1,0 +1,77 @@
+version: '3.9'
+
+services:
+  # ─── Planning Backend ─────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    container_name: opp-backend
+    ports:
+      - '3100:3100'
+    environment:
+      - PORT=3100
+      - NODE_ENV=production
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3100/api/pcp/v1/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  # ─── Frontend (standalone repo / vendor/ layout) ──────────────────────────
+  # Build context = planning-platform repo root (vendor/ required).
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile.standalone
+    container_name: opp-frontend
+    ports:
+      - '5173:80'
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+
+  # ─── PostgreSQL (transactional data) ─────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: opp-postgres
+    environment:
+      POSTGRES_DB: opp
+      POSTGRES_USER: opp
+      POSTGRES_PASSWORD: opp_dev_password
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U opp -d opp']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Redis (live planning cache) ──────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: opp-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:

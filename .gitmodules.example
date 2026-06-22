@@ -1,0 +1,28 @@
+# Example submodule layout for a standalone planning-platform repository.
+# Copy to .gitmodules and adjust URLs to your forks or the HAE monorepo paths.
+#
+#   cp .gitmodules.example .gitmodules
+#   git submodule add <url> vendor/cockpit
+#   …
+#   git submodule update --init --recursive
+
+[submodule "vendor/cockpit"]
+	path = vendor/cockpit
+	url = https://github.com/schmeckm/planningplatform.git
+	# Sparse checkout or subtree filter may be required — see docs/developers/repo-extraction.md
+
+[submodule "vendor/portal"]
+	path = vendor/portal
+	url = https://github.com/schmeckm/planningplatform.git
+
+[submodule "vendor/styles"]
+	path = vendor/styles
+	url = https://github.com/schmeckm/planningplatform.git
+
+[submodule "vendor/config"]
+	path = vendor/config
+	url = https://github.com/schmeckm/planningplatform.git
+
+[submodule "vendor/process-definitions"]
+	path = vendor/process-definitions
+	url = https://github.com/schmeckm/planningplatform.git

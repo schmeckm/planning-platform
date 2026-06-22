@@ -1,0 +1,14 @@
+# Default owners for planning-platform (future standalone repo root)
+* @schmeckm
+
+/apps/backend/ @schmeckm
+/apps/frontend/ @schmeckm
+/packages/planning-core/ @schmeckm
+/packages/planning-constraints/ @schmeckm
+/packages/planning-pharma/ @schmeckm
+/packages/planning-cgt/ @schmeckm
+/packages/planning-adapters/ @schmeckm
+/packages/planning-shopfloor/ @schmeckm
+/packages/planning-sdk/ @schmeckm
+/packages/planning-scenarios/ @schmeckm
+/docs/ @schmeckm

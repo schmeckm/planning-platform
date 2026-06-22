@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "description": "Sibling paths required for @PCP/frontend embedded mode (Cockpit + Portal shell).",
+  "envVar": "HAE_MONOREPO_ROOT",
+  "requiredPaths": [
+    {
+      "id": "cockpit",
+      "path": "cockpit/src",
+      "purpose": "Planning cockpit views mounted under /planning/*"
+    },
+    {
+      "id": "portal",
+      "path": "portal/frontend/src",
+      "purpose": "Auth shell, layouts, landing pages"
+    },
+    {
+      "id": "portal-public",
+      "path": "portal/frontend/public",
+      "purpose": "Static assets (logo, images)"
+    },
+    {
+      "id": "styles",
+      "path": "styles",
+      "purpose": "Shared enterprise / portal theme CSS"
+    },
+    {
+      "id": "config",
+      "path": "config",
+      "purpose": "@config/* branding and platform config"
+    },
+    {
+      "id": "process-definitions",
+      "path": "process-definitions",
+      "purpose": "@process-definitions/* process domain metadata"
+    }
+  ],
+  "submoduleLayout": {
+    "strategy": "git-submodule",
+    "vendorDir": "vendor",
+    "syncScript": "scripts/sync-vendor-from-hae.mjs",
+    "exportScript": "scripts/export-standalone-tree.mjs",
+    "note": "Standalone repo: vendor/ submodules or pnpm sync:vendor. Monorepo: sibling paths at HAE root."
+  }
+}

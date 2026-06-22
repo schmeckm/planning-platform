@@ -1,0 +1,89 @@
+# Canonical CI for planning-platform as a standalone repository.
+# Canonical CI for the standalone planning-platform repository.
+name: Planning Platform CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: .
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec eslint "packages/planning-core/src" "packages/planning-constraints/src"
+
+  test-packages:
+    name: Test ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - '@PCP/planning-core'
+          - '@PCP/planning-constraints'
+          - '@PCP/planning-pharma'
+          - '@PCP/planning-cgt'
+          - '@PCP/planning-adapters'
+          - '@PCP/planning-sdk'
+          - '@PCP/planning-scenarios'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter ${{ matrix.package }} test -- --reporter=verbose
+
+  typecheck-packages:
+    name: Typecheck packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r --filter "./packages/*..." exec tsc -b tsconfig.json --force
+
+  ci-gate:
+    name: CI passed
+    needs: [lint, test-packages, typecheck-packages]
+    runs-on: ubuntu-latest
+    if: always()
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - name: Verify required jobs
+        run: |
+          if [[ "${{ needs.lint.result }}" != "success" || \
+                "${{ needs.typecheck-packages.result }}" != "success" || \
+                "${{ needs.test-packages.result }}" != "success" ]]; then
+            echo "One or more CI jobs failed."
+            exit 1
+          fi
+          echo "Planning Platform CI passed."

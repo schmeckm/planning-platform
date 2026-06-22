@@ -1,0 +1,10 @@
+node_modules
+**/node_modules
+**/.vitepress/cache
+.runtime
+.git
+*.log
+docs/.vitepress/dist
+apps/frontend/dist
+
+# Package dist/ must be present (build locally before docker compose build backend)

@@ -1,0 +1,111 @@
+@import '../../../../styles/platform-brand.css';
+
+/* ── VitePress: Platform-Markenfarben (Schwarz + Blau) ── */
+:root {
+  --vp-c-brand-1: var(--platform-brand-blue);
+  --vp-c-brand-2: var(--platform-brand-blue-hover);
+  --vp-c-brand-3: #7393eb;
+  --vp-c-brand-soft: var(--platform-brand-blue-soft);
+
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(
+    135deg,
+    #1f3a8c 0%,
+    var(--platform-brand-blue) 50%,
+    var(--platform-brand-blue-light) 100%
+  );
+  --vp-home-hero-image-background-image: radial-gradient(
+    circle,
+    rgba(65, 105, 225, 0.15) 0%,
+    transparent 70%
+  );
+  --vp-home-hero-image-filter: drop-shadow(0 12px 40px rgba(65, 105, 225, 0.35));
+  --vp-home-hero-image-width: min(320px, 42vw);
+}
+
+/* Vogelschwarm — Collective Intelligence (Introduction / concept pages) */
+.ci-leitbild {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  margin: 0 0 2.5rem;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border-radius: 12px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-soft);
+}
+
+.ci-leitbild img {
+  max-width: min(320px, 80vw);
+  height: auto;
+  filter: drop-shadow(0 12px 32px rgba(65, 105, 225, 0.25));
+}
+
+.ci-leitbild p {
+  margin: 0;
+  max-width: 36rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--vp-c-text-2);
+}
+
+.dark {
+  --vp-c-brand-1: #7393eb;
+  --vp-c-brand-2: var(--platform-brand-blue);
+  --vp-c-brand-3: #96aef0;
+  --vp-c-brand-soft: rgba(115, 147, 235, 0.14);
+
+  /* Platform Schwarz — Standard-Hintergrund */
+  --vp-c-bg: #0a0e17;
+  --vp-c-bg-alt: #0f1419;
+  --vp-c-bg-soft: #1a1f26;
+  --vp-c-bg-elv: #1a1f26;
+  --vp-nav-bg-color: rgba(10, 14, 23, 0.95);
+  --vp-home-hero-bg-color: #0a0e17;
+}
+
+/* ── Release Notes ── */
+.release-notes-layout {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 960px) {
+  .release-notes-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .release-notes-layout__sidebar {
+    position: sticky;
+    top: calc(var(--vp-nav-height) + 2rem);
+    padding-right: 1.5rem;
+    border-right: 1px solid var(--vp-c-divider);
+  }
+}
+
+.release-note-lede {
+  margin: 1.25rem 0 2rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--vp-c-text-2);
+}
+
+.release-note-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.release-note-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: var(--vp-c-text-2);
+  background: var(--vp-c-bg-soft);
+}

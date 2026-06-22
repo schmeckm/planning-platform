@@ -1,0 +1,35 @@
+{
+  "name": "pharma-collective-platform",
+  "version": "0.1.0",
+  "description": "Pharma Collective Platform – Module: Planning – modular, extensible scheduling kernel inspired by the Linux Kernel model",
+  "private": true,
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "dev:backend": "pnpm --filter @PCP/backend dev",
+    "dev:frontend": "pnpm --filter @PCP/frontend dev",
+    "dev:docs": "pnpm --filter @PCP/docs dev",
+    "dev:api": "pnpm dev:backend",
+    "dev:web": "pnpm dev:frontend",
+    "validate:hae": "node scripts/validate-hae-integration.mjs",
+    "sync:vendor": "node scripts/sync-vendor-from-hae.mjs",
+    "export:standalone": "node scripts/export-standalone-tree.mjs",
+    "promote:standalone": "node scripts/promote-standalone-repo.mjs",
+    "validate:standalone": "node scripts/validate-standalone-export.mjs",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.5.0",
+    "@types/node": "^20.14.0",
+    "eslint": "^9.5.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}

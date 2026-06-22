@@ -1,0 +1,36 @@
+# Constraint & adapter simulation tests (Vitest — no running API server required).
+# Canonical CI for the standalone planning-platform repository.
+name: Planning Platform Simulation Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: .
+
+jobs:
+  simulation-tests:
+    name: Constraint simulation suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Generic constraints
+        run: pnpm --filter @PCP/planning-constraints test -- --reporter=verbose
+      - name: Pharma industry pack
+        run: pnpm --filter @PCP/planning-pharma test -- --reporter=verbose
+      - name: CGT industry pack
+        run: pnpm --filter @PCP/planning-cgt test -- --reporter=verbose
+      - name: Mock adapter fixtures
+        run: pnpm --filter @PCP/planning-adapters test -- --reporter=verbose
