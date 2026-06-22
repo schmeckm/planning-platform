@@ -13,11 +13,20 @@ This guide walks you through setting up Pharma Collective Platform locally in ab
 
 ## Installation
 
-### 1. Clone the Repository
+### 1. Clone the repository
+
+**Standalone OPP** (kernel only):
 
 ```bash
-git clone https://github.com/schmeckm/planningplatform.git
-cd open-planning-platform
+git clone https://github.com/schmeckm/planning-platform.git
+cd planning-platform
+```
+
+**Embedded in HAE monorepo** (full plant stack):
+
+```bash
+git clone --recurse-submodules https://github.com/schmeckm/planningplatform.git
+cd planningplatform/open-planning-platform
 ```
 
 ### 2. Install Dependencies

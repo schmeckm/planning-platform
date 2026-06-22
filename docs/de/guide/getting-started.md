@@ -15,9 +15,18 @@ Diese Anleitung führt durch die lokale Installation der Pharma Collective Platf
 
 ### 1. Repository klonen
 
+**Standalone OPP** (nur Kernel):
+
 ```bash
-git clone https://github.com/schmeckm/planningplatform.git
-cd open-planning-platform
+git clone https://github.com/schmeckm/planning-platform.git
+cd planning-platform
+```
+
+**Im HAE-Monorepo** (voller Werks-Stack):
+
+```bash
+git clone --recurse-submodules https://github.com/schmeckm/planningplatform.git
+cd planningplatform/open-planning-platform
 ```
 
 ### 2. Abhängigkeiten installieren

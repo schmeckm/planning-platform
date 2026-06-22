@@ -172,7 +172,28 @@ pnpm --filter @PCP/planning-scenarios test       ✅
 
 ---
 
-## Nächste Schritte (PR 11+)
+## Nächste Schritte (PR 12+)
 
-- **PR 11:** Standalone-Repo auf GitHub anlegen und Submodule in HAE aktivieren
-- **PR 11:** Optional — `git filter-repo` / History-Split für sauberes `planning-platform`
+## PR 11 — Standalone-Repo & Submodule ✓ abgeschlossen (2026-06-22)
+
+| Änderung | Beschreibung |
+|----------|--------------|
+| [github.com/schmeckm/planning-platform](https://github.com/schmeckm/planning-platform) | Eigenes OPP-Repo (Export + Push) |
+| `.gitmodules` im HAE-Monorepo | `open-planning-platform` als Submodule |
+| `scripts/bind-opp-submodule.ps1` | Einmaliges Binding nach Push |
+| `scripts/push-standalone-export.ps1` | Push aus `planning-platform-export/` |
+| `docs/IT.md` | Clone mit `--recurse-submodules`, Zwei-Repo-Modell |
+
+Optional offen: `git filter-repo` für saubere History im Standalone-Repo (ohne HAE-Commits).
+
+---
+
+## PR 12 — Portal als Standard-UI (2026-06-22)
+
+| Änderung | Beschreibung |
+|----------|--------------|
+| `scripts/start.ps1` | `dev` = Portal-Stack (:5173) + Docs; `cockpit-dev` = deprecated :3001 |
+| `docs/FEATURE-MIGRATION.md` | Checkliste pro Planungs-Feature (Cockpit → Portal/OPP) |
+| README / IT.md | Portal als Quick-Start-Default |
+
+**Strategie:** Shell-Migration abgeschlossen; Feature-Code in `cockpit/` wird wellenweise nach `portal/` bzw. OPP überführt. Siehe [docs/FEATURE-MIGRATION.md](../docs/FEATURE-MIGRATION.md).
