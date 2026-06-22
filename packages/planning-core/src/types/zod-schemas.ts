@@ -59,6 +59,7 @@ export const PlanningOrderSchema = z.object({
   operations: z.array(PlanningOperationSchema),
   tags: z.record(z.string()),
   patientId: z.string().optional(),
+  destinationCountry: z.string().length(2).optional(),
   schedulingStatus: SchedulingStatusSchema,
   scheduledStart: z.coerce.date().optional(),
   scheduledFinish: z.coerce.date().optional(),
@@ -91,6 +92,8 @@ export const PlanningBatchSchema = z.object({
   availableFrom: z.coerce.date(),
   locationId: z.string().optional(),
   patientId: z.string().optional(),
+  approvedCountries: z.array(z.string().length(2)).optional(),
+  inspectionLotStatus: z.enum(['OPEN', 'RELEASED', 'REJECTED', 'SKIPPED']).optional(),
   attributes: z.record(z.union([z.string(), z.number(), z.boolean()])),
 });
 

@@ -70,6 +70,9 @@ export type BatchStatus =
   | 'EXPIRED'
   | 'QUARANTINE';
 
+/** SAP QM inspection lot lifecycle mapped to canonical planning checks. */
+export type InspectionLotStatus = 'OPEN' | 'RELEASED' | 'REJECTED' | 'SKIPPED';
+
 export type ConstraintSeverity = 'BLOCKER' | 'WARNING' | 'RECOMMENDATION' | 'INFO';
 
 export type SchedulingStatus =
@@ -103,6 +106,8 @@ export interface PlanningOrder {
   tags: Record<string, string>;
   /** Patient ID for CGT patient-specific orders */
   patientId?: string;
+  /** Destination market (ISO 3166-1 alpha-2) for TRIC / country release checks */
+  destinationCountry?: string;
   schedulingStatus: SchedulingStatus;
   scheduledStart?: Date;
   scheduledFinish?: Date;
@@ -177,6 +182,10 @@ export interface PlanningBatch {
   locationId?: string;
   /** Chain of identity – for CGT patient-specific batches */
   patientId?: string;
+  /** Countries where batch is market-released (TRIC / QP release) */
+  approvedCountries?: string[];
+  /** QM inspection lot status when batch release depends on lab completion */
+  inspectionLotStatus?: InspectionLotStatus;
   attributes: Record<string, string | number | boolean>;
 }
 

@@ -23,7 +23,15 @@ For readable release stories, see [Release Notes](/community/release-notes/).
 
 ### Added
 
-- `load-backend-env.mjs` — auto-loads `apps/backend/.env` for `db:migrate`, `db:seed`, and dev server
+- Phase 2 constraint plugins (13 total registered):
+  - `pharma.batch.country-release-tric` — TRIC / country market release
+  - `pharma.cleaning.validation` — product changeover cleaning matrix
+  - `pharma.campaign.sequencing` — campaign grouping soft check
+  - `pharma.qa.inspection-lot` — QM inspection lot status
+  - `cgt.storage.cryogenic-capacity` — cryo slot capacity
+  - `cgt.logistics.courier-window` — courier pickup window
+- Canonical model: `destinationCountry`, `approvedCountries`, `inspectionLotStatus`
+- Mock adapter: `ORD-PH-004` TRIC demo scenario (JP destination)
 - HAE adapter registration fix — `PlanningService` loads `.env` before singleton init (`9b71a3c`)
 - Docker Compose Postgres host port **5433** (avoids conflict with HAE Postgres on 5432)
 - Documentation refresh: roadmap, getting started, HAE adapter guide

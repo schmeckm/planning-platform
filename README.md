@@ -140,14 +140,20 @@ curl -X POST http://localhost:3100/api/pcp/v1/simulations \
   -d '{ "name": "MVP Demo Simulation", "triggeredBy": "planner" }'
 ```
 
-The engine evaluates **7 constraints** across all 5 orders:
+The engine evaluates **13 constraints** across all orders:
 - ATP Availability Check
 - Resource Capacity Check
 - Remaining Shelf Life (RMSL)
 - GMP Batch Release Status
 - Hold Time Check
+- Country Batch Release (TRIC)
+- Cleaning Validation Matrix
+- Campaign Sequencing (soft)
+- QA Inspection Lot Status
 - Chain of Identity (CGT)
 - Vein-to-Vein Deadline (CGT)
+- Cryogenic Storage Capacity (CGT)
+- Courier Shipment Window (CGT)
 
 ### 3. View Results
 
@@ -357,17 +363,17 @@ Migrationslog: [MIGRATION.md](MIGRATION.md)
 - [x] Constraint Explorer with self-test runner (`POST /constraints/self-test`)
 - [x] Docker Compose (Postgres host port **5433**, Redis, backend)
 
-### Phase 2 — in progress (3/9 done)
+### Phase 2 — in progress (8/9 constraint items done)
 
 - [x] PostgreSQL persistence layer (OPP shadow store: `pcp_*` tables)
 - [x] HAE PostgreSQL adapter (`hae.postgres` — read-only `hap_*` bridge)
 - [x] ERPNext adapter v0.1 (fixture + Frappe REST API)
-- [ ] Cleaning validation matrix constraint
-- [ ] Campaign sequencing constraint
-- [ ] Country/batch release check (TRIC)
-- [ ] QA inspection lot status constraint
-- [ ] Cryogenic storage capacity constraint (CGT)
-- [ ] Courier/shipment window constraint (CGT)
+- [x] Cleaning validation matrix constraint
+- [x] Campaign sequencing constraint
+- [x] Country/batch release check (TRIC)
+- [x] QA inspection lot status constraint
+- [x] Cryogenic storage capacity constraint (CGT)
+- [x] Courier/shipment window constraint (CGT)
 - [ ] SAP PP/DS adapter (sequence-dependent setup, pegging)
 
 ### Phase 3 — planned

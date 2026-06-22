@@ -33,16 +33,12 @@
 - [x] ERPNext adapter v0.1 (`erpnext` — fixture + Frappe REST API)
 - [x] Per-order constraint scoring in simulation results (severity-weighted `score` + `metadata.summary`)
 - [x] End-to-end verified: HAE Postgres → OPP shadow DB → constraint simulation
+- [x] Phase 2 pharma constraints: TRIC, cleaning matrix, campaign sequencing, QA inspection lot
+- [x] Phase 2 CGT constraints: cryogenic storage capacity, courier shipment window
 
 ### Next
 
 - [ ] SAP PP/DS adapter (sequence-dependent setup matrices, pegging)
-- [ ] Cleaning validation matrix constraint (Pharma)
-- [ ] Campaign sequencing constraint (Pharma)
-- [ ] Country/batch release check — TRIC (Pharma)
-- [ ] QA inspection lot status constraint (Pharma)
-- [ ] Cryogenic storage capacity constraint (CGT)
-- [ ] Courier/shipment window constraint (CGT)
 - [ ] Generic MES adapter interface ([Shopfloor MQTT module](/modules/shopfloor))
 - [ ] Multi-objective optimization (beyond constraint scoring)
 - [ ] AI knowledge layer ("Why was this order blocked?" — natural language)

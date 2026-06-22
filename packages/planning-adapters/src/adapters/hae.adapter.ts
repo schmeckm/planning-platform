@@ -508,6 +508,7 @@ export class HardAllocationEngineAdapter implements IPlanningAdapter {
           : {}),
         ...(r.production_line ? { 'hae.productionLine': r.production_line } : {}),
       },
+      ...(r.destination_country ? { destinationCountry: r.destination_country.toUpperCase() } : {}),
       schedulingStatus: this.mapSchedulingStatus(r.lifecycle_stage ?? r.status),
       metadata: { originalRow: r.packaging_order_id },
       createdAt: now,

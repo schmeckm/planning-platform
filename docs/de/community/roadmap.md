@@ -4,31 +4,29 @@
 
 ## Phase 1 — Foundation ✓ abgeschlossen
 
-Kernmodell, 7 Constraints (Generic + Pharma + CGT), Mock-Adapter, REST/Swagger, Vue-Board, Docker, CI.
+Kernmodell, Constraint-Plugins, Mock-Adapter, REST/Swagger, Vue-Board, Docker, CI.
 
-## Phase 2 — Adapter & Ökosystem (in Arbeit)
+## Phase 2 — Adapter & Ökosystem (fast abgeschlossen)
 
 ### Erledigt
 
-- [x] PostgreSQL-Persistenz (OPP Shadow-Store `pcp_*`)
-- [x] HAE-Adapter `hae.postgres` (read-only `hap_*`)
-- [x] SAP S/4HANA v0.2 (`sap.s4hana` — Fixture + OData)
-- [x] ERPNext v0.1 (`erpnext` — Fixture + REST API)
-- [x] Constraint-Scoring in Simulationen
-- [x] End-to-End: HAE Postgres → OPP → Simulation
+- [x] PostgreSQL, HAE-Adapter, SAP v0.2, ERPNext v0.1
+- [x] **Pharma:** TRIC, Cleaning Matrix, Campaign Sequencing, QA Inspection Lot
+- [x] **CGT:** Cryogenic Storage, Courier Window
+- [x] **13 Constraints** registriert (3 Generic + 6 Pharma + 4 CGT)
 
 ### Als Nächstes
 
-- [ ] SAP PP/DS, TRIC, Cleaning Matrix, Campaign Sequencing
-- [ ] CGT: Kryo-Lager, Kurier-Fenster
-- [ ] OPP ↔ OR-Tools-Brücke (HAE-Sidecar :8010 existiert)
+- [ ] SAP PP/DS Adapter
+- [ ] MES-Adapter-Interface
+- [ ] Multi-Objective-Optimierung / AI-Erklärungslayer
 
 ## Phase 3 — Validierung & GxP
 
-IQ/OQ/PQ, eSign, versionierte Simulationsläufe, Validierungsberichte.
+IQ/OQ/PQ, eSign, versionierte Simulationsläufe.
 
 ## Phase 4 — Intelligence
 
 CP-SAT in OPP, pgvector, Neo4j, Szenario-Vergleich.
 
-→ [Vollständige englische Roadmap](/community/roadmap) · [Changelog](/community/changelog)
+→ [Englische Roadmap](/community/roadmap)
