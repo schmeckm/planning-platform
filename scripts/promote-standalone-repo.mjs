@@ -60,10 +60,17 @@ function main() {
   }
 
   if (!dryRun && initGit) {
-    spawnSync('git', ['init'], { cwd: outDir, stdio: 'inherit' });
+    spawnSync('git', ['init', '-b', 'main'], { cwd: outDir, stdio: 'inherit' });
     spawnSync('git', ['add', '.'], { cwd: outDir, stdio: 'inherit' });
     const commitMsg = `Initial planning-platform export (${getSourceCommit() ?? 'unknown'})`;
-    spawnSync('git', ['commit', '-m', commitMsg], { cwd: outDir, stdio: 'inherit' });
+    const commit = spawnSync('git', ['commit', '-m', commitMsg], { cwd: outDir, stdio: 'inherit' });
+    if (commit.status !== 0) {
+      console.error('git commit im Export-Verzeichnis fehlgeschlagen (evtl. nichts zu committen).');
+      process.exit(commit.status ?? 1);
+    }
+    console.info('');
+    console.info('Git init OK. Push mit:');
+    console.info(`  ..\\scripts\\push-standalone-export.ps1 -RemoteUrl https://github.com/your-org/planning-platform.git`);
   }
 
   console.info('');

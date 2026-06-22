@@ -63,22 +63,31 @@ This tree was generated from the HAE monorepo (\`open-planning-platform/\`).
 
 ## First push
 
+**Wichtig:** `planning-platform-export/` ist ein **eigenes** Git-Repo. Befehle wie `git remote`/`git push` dort ausführen — nicht im HAE-Monorepo-Root (dessen `origin` zeigt auf `planningplatform`).
+
+1. Leeres Repo auf GitHub anlegen: \`https://github.com/new\` → Name \`planning-platform\`
+2. Push vom HAE-Root:
+
+\`\`\`powershell
+# HAE monorepo root
+.\\scripts\\push-standalone-export.ps1 -RemoteUrl https://github.com/schmeckm/planning-platform.git
+\`\`\`
+
+Oder manuell:
+
 \`\`\`bash
-git init
-git add .
-git commit -m "Initial planning-platform standalone export"
-git remote add origin https://github.com/your-org/planning-platform.git
-git branch -M main
-git push -u origin main
+git -C planning-platform-export remote add origin https://github.com/schmeckm/planning-platform.git
+git -C planning-platform-export branch -M main
+git -C planning-platform-export push -u origin main
 \`\`\`
 
 ## HAE monorepo binding
 
-After the standalone repo exists, bind it in HAE:
+**Nur nach erfolgreichem Push** — vom **HAE-Monorepo-Root** (nicht aus \`planning-platform-export/\`):
 
-\`\`\`bash
-# from HAE repository root
-.\\scripts\\bind-opp-submodule.ps1 -RemoteUrl https://github.com/your-org/planning-platform.git
+\`\`\`powershell
+cd ..   # falls du noch in planning-platform-export bist
+.\\scripts\\bind-opp-submodule.ps1 -RemoteUrl https://github.com/schmeckm/planning-platform.git
 \`\`\`
 
 See \`docs/developers/repo-extraction.md\`.

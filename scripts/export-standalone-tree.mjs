@@ -13,9 +13,13 @@ const SKIP_DIRS = new Set([
   '.git',
   '.runtime',
   'vendor',
+  'cache',
+  '.temp',
 ]);
 
 const SKIP_FILES = new Set(['.DS_Store', 'Thumbs.db']);
+
+const SKIP_EXTENSIONS = new Set(['.tsbuildinfo']);
 
 function parseArgs(argv) {
   const dryRun = argv.includes('--dry-run');
@@ -28,7 +32,8 @@ function parseArgs(argv) {
 }
 
 function shouldSkipEntry(name) {
-  return SKIP_DIRS.has(name) || SKIP_FILES.has(name);
+  return SKIP_DIRS.has(name) || SKIP_FILES.has(name) ||
+    SKIP_EXTENSIONS.has(path.extname(name));
 }
 
 function copyTree(from, to, dryRun) {
