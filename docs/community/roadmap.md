@@ -22,7 +22,7 @@
 
 - [x] PostgreSQL persistence layer (OPP shadow store: orders, simulations, inventory)
 - [x] HAE PostgreSQL adapter (`hae.postgres` — reads `hap_*` tables)
-- [ ] SAP S/4HANA adapter (production orders, work centers, shift sequences)
+- [x] SAP S/4HANA adapter v0.2 (`sap.s4hana` — fixture + OData production orders, work centers, materials, batches, stock)
 - [ ] SAP PP/DS adapter (sequence-dependent setup matrices, pegging)
 - [ ] Generic MES adapter interface ([reference: Shopfloor MQTT module](/modules/shopfloor))
 - [ ] ERPNext adapter

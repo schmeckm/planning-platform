@@ -1,0 +1,102 @@
+import type {
+  SapProductionOrder,
+  SapWorkCenter,
+  SapMaterial,
+  SapBatch,
+  SapInventory,
+} from './sap-s4.types.js';
+
+/** Realistic SAP-shaped fixture data for demo and tests (plant 1000, pharma). */
+export const SAP_S4_FIXTURES = {
+  plant: '1000',
+  orders: [
+    {
+      AUFNR: '10001234',
+      MATNR: 'FG-ASPIRIN-500',
+      CHARG: 'BATCH-2026-001',
+      MENGE: 50000,
+      GMEIN: 'EA',
+      GLTRP: '20260715',
+      GSTRS: '20260625',
+      FTRMS: '20260625',
+      DISPO: '001',
+      WERKS: '1000',
+      STATU: 'REL',
+      PRIOK: '2',
+      OPERATIONS: [
+        { VORNR: '0010', LTXA1: 'Granulation', ARBPL: 'GRAN-01', VGW01: 30, VGW02: 240, VGW03: 15, ARBEI: 285 },
+        { VORNR: '0020', LTXA1: 'Compression', ARBPL: 'TAB-01', VGW01: 20, VGW02: 180, VGW03: 10, ARBEI: 210 },
+      ],
+    },
+    {
+      AUFNR: '10001235',
+      MATNR: 'FG-ASPIRIN-500',
+      CHARG: 'BATCH-2026-HOLD',
+      MENGE: 25000,
+      GMEIN: 'EA',
+      GLTRP: '20260720',
+      GSTRS: '20260628',
+      FTRMS: '20260628',
+      DISPO: '001',
+      WERKS: '1000',
+      STATU: 'REL',
+      PRIOK: '3',
+      OPERATIONS: [
+        { VORNR: '0010', LTXA1: 'Coating', ARBPL: 'COAT-01', VGW01: 45, VGW02: 300, VGW03: 20, ARBEI: 365 },
+      ],
+    },
+    {
+      AUFNR: '10001236',
+      MATNR: 'API-IBUPROFEN',
+      CHARG: '',
+      MENGE: 1200,
+      GMEIN: 'KG',
+      GLTRP: '20260801',
+      GSTRS: '20260701',
+      FTRMS: '20260701',
+      DISPO: '002',
+      WERKS: '1000',
+      STATU: 'CRTD',
+      PRIOK: '3',
+      OPERATIONS: [
+        { VORNR: '0010', LTXA1: 'Synthesis', ARBPL: 'REACT-03', VGW01: 60, VGW02: 480, VGW03: 30, ARBEI: 570 },
+      ],
+    },
+  ] satisfies SapProductionOrder[],
+  workCenters: [
+    { ARBPL: 'GRAN-01', KTEXT: 'Granulation Line 1', WERKS: '1000', KAPAZ: 1 },
+    { ARBPL: 'TAB-01', KTEXT: 'Tablet Press 1', WERKS: '1000', KAPAZ: 1 },
+    { ARBPL: 'COAT-01', KTEXT: 'Coating Line 1', WERKS: '1000', KAPAZ: 1 },
+    { ARBPL: 'REACT-03', KTEXT: 'Reactor 3', WERKS: '1000', KAPAZ: 1 },
+  ] satisfies SapWorkCenter[],
+  materials: [
+    { MATNR: 'FG-ASPIRIN-500', MAKTX: 'Aspirin 500mg Tablets', MEINS: 'EA', MHDHB: 730 },
+    { MATNR: 'API-IBUPROFEN', MAKTX: 'Ibuprofen API', MEINS: 'KG', MHDHB: 365 },
+  ] satisfies SapMaterial[],
+  batches: [
+    {
+      CHARG: 'BATCH-2026-001',
+      MATNR: 'FG-ASPIRIN-500',
+      WERKS: '1000',
+      CLABS: 48000,
+      MEINS: 'EA',
+      VFDAT: '20280601',
+      HSDAT: '20260601',
+      STATUS: 'RELEASED',
+    },
+    {
+      CHARG: 'BATCH-2026-HOLD',
+      MATNR: 'FG-ASPIRIN-500',
+      WERKS: '1000',
+      CLABS: 22000,
+      MEINS: 'EA',
+      VFDAT: '20280615',
+      HSDAT: '20260610',
+      STATUS: 'BLOCKED',
+    },
+  ] satisfies SapBatch[],
+  inventory: [
+    { MATNR: 'FG-ASPIRIN-500', WERKS: '1000', LGORT: '0001', CLABS: 70000, MEINS: 'EA' },
+    { MATNR: 'API-IBUPROFEN', WERKS: '1000', LGORT: '0001', CLABS: 800, MEINS: 'KG' },
+  ] satisfies SapInventory[],
+};

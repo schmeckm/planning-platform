@@ -23,7 +23,10 @@ For readable release stories, see [Release Notes](/community/release-notes/).
 
 ### Added
 
-- PostgreSQL persistence for planning entities (`pcp_orders`, `pcp_resources`, `pcp_materials`, `pcp_batches`, `pcp_inventory`, `pcp_simulation_runs`)
+- SAP S/4HANA adapter v0.2 (`sap.s4hana`) — fixture demo mode + OData live mode for orders, work centers, materials, batches, stock
+- `@PCP/planning-adapters` tests for SAP fixture adapter (8 tests)
+
+### Added (prior unreleased)
 - `pnpm --filter @PCP/backend db:migrate` and `db:seed` (supports `--adapter=mock.pharma|hae.postgres`)
 - Health endpoint reports `persistence: postgresql | in-memory`
 - Integration tests for Postgres repositories (when `PCP_DATABASE_URL` is set)

@@ -4,7 +4,38 @@ The SAP S/4HANA adapter maps production orders, work centers, shift sequences, a
 
 ## Status
 
-🚧 **In development** — contributions welcome. See [Build an Adapter](/adapters/custom).
+**v0.2.0** — Fixture mode (demo without SAP credentials) + OData mode for live S/4HANA systems.
+
+| Mode | When | Adapter ID |
+|---|---|---|
+| **Fixture** | Default (no `SAP_BASE_URL`) | `sap.s4hana` |
+| **OData** | `SAP_BASE_URL` + credentials set | `sap.s4hana` |
+
+```bash
+# Load SAP fixture data into OPP shadow DB
+pnpm --filter @PCP/backend db:seed -- --adapter=sap.s4hana
+
+# Or via API
+curl -X POST http://localhost:3100/api/pcp/v1/simulations/load-adapter \
+  -H "Content-Type: application/json" \
+  -d '{ "adapterId": "sap.s4hana" }'
+```
+
+## Authentication (OData mode)
+
+```typescript
+import { createSapS4Adapter } from '@PCP/planning-adapters'
+
+const adapter = createSapS4Adapter({
+  baseUrl: 'https://your-system.s4hana.ondemand.com',
+  plant: '1000',
+  client: '100',
+  username: process.env.SAP_USERNAME,
+  password: process.env.SAP_PASSWORD,
+})
+```
+
+Environment variables: `SAP_BASE_URL`, `SAP_CLIENT`, `SAP_USERNAME`, `SAP_PASSWORD`, `SAP_PLANT`, `SAP_ADAPTER_MODE`.
 
 ## Field Mapping
 
