@@ -43,7 +43,7 @@ import {
 } from '@PCP/planning-constraints';
 import { pharmaConstraints } from '@PCP/planning-pharma';
 import { cgtConstraints } from '@PCP/planning-cgt';
-import { MockPharmaAdapter, createHaeAdapter, createSapS4Adapter, createErpNextAdapter } from '@PCP/planning-adapters';
+import { MockPharmaAdapter, createHaeAdapter, createSapS4Adapter, createErpNextAdapter, createProductionSequencingAdapter } from '@PCP/planning-adapters';
 import type { IPlanningAdapter } from '@PCP/planning-adapters';
 import { randomUUID } from 'node:crypto';
 
@@ -128,6 +128,7 @@ export class PlanningService {
     this.adapters.set('mock.pharma', new MockPharmaAdapter());
     this.adapters.set('sap.s4hana', createSapS4Adapter());
     this.adapters.set('erpnext', createErpNextAdapter());
+    this.adapters.set('production.sequencing', createProductionSequencingAdapter());
 
     const haeDbUrl = resolveHaeDatabaseUrl();
     if (haeDbUrl) {

@@ -80,7 +80,7 @@ const adapter = new SapS4Adapter({
 
 ## Known Limitations
 
-- PP/DS-specific fields (like sequence-dependent setup matrices) require a separate PP/DS adapter
+- PP/DS-specific fields (like sequence-dependent setup matrices) are covered by the vendor-neutral [Production Sequencing Adapter](/adapters/production-sequencing)
 - Batch classification data (`KLAH`, `AUSP`) must be fetched via Classification Service — not included in base order fetch
 - Shelf life data requires integration with Batch Management (`MCH1`, `MCHA`)
 

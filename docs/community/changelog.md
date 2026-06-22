@@ -38,8 +38,9 @@ For readable release stories, see [Release Notes](/community/release-notes/).
 - SAP S/4HANA adapter v0.2 (`sap.s4hana`) — fixture demo mode + OData live mode for orders, work centers, materials, batches, stock
 - ERPNext adapter v0.1 (`erpnext`) — fixture demo mode + Frappe REST API for Work Orders, Workstations, Items, Batches, Bin
 - HAE PostgreSQL adapter (`hae.postgres`) — read-only bridge to `hap_*` tables
+- Production Sequencing adapter v0.1 (`production.sequencing`) — vendor-neutral detailed routings, sequence-dependent setup, pegging (fixture + REST hook)
 - `pnpm --filter @PCP/planning-adapters verify:sap` — SAP OData connectivity check
-- `@PCP/planning-adapters` fixture tests: 36 total (22 mock + 8 SAP + 6 ERPNext)
+- `@PCP/planning-adapters` fixture tests: 42+ total (mock + SAP + ERPNext + production sequencing)
 
 ### Added (prior unreleased)
 

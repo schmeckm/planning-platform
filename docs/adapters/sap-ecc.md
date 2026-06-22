@@ -1,14 +1,7 @@
-# SAP ECC / PP/DS Adapter
+# Production Sequencing (Legacy SAP ECC doc)
 
-> 📋 **Planned** — contributions welcome. See [Build an Adapter](/adapters/custom).
+> **Moved** — Detailed scheduling data (sequence-dependent setup, pegging, multi-step routings) is implemented as the vendor-neutral [Production Sequencing Adapter](/adapters/production-sequencing) (`production.sequencing`).
 
-## Scope
+This page previously referred to a "SAP ECC / PP/DS" adapter. That name is **not used** for legal/trademark reasons. Use `production.sequencing` instead.
 
-This adapter will cover:
-- SAP ECC Production Orders (AUFK, AFKO, AFPO)
-- PP/DS-specific data (sequence-dependent setup matrices, pegging relationships)
-- Work center capacities (CRHD, CRCA)
-- Shift sequences (SCHICHT)
-- Batch management (MCH1, MCHA)
-
-Want to lead this adapter? Open a GitHub Discussion tagged `adapter:sap-ecc`.
+For SAP S/4 order master and stock, see [SAP S/4HANA Adapter](/adapters/sap-s4).

@@ -38,7 +38,7 @@
 
 ### Next
 
-- [ ] SAP PP/DS adapter (sequence-dependent setup matrices, pegging)
+- [x] Production Sequencing adapter (sequence-dependent setup matrices, pegging) — `production.sequencing`
 - [ ] Generic MES adapter interface ([Shopfloor MQTT module](/modules/shopfloor))
 - [ ] Multi-objective optimization (beyond constraint scoring)
 - [ ] AI knowledge layer ("Why was this order blocked?" — natural language)

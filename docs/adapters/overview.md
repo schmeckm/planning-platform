@@ -38,7 +38,7 @@ export interface PlanningDataAdapter {
 | Adapter | Package | Status |
 |---|---|---|
 | SAP S/4HANA | `@PCP/adapter-sap-s4` | 🚧 In development |
-| SAP ECC / PP/DS | `@PCP/adapter-sap-ecc` | 📋 Planned |
+| Production Sequencing | `@PCP/planning-adapters` (`production.sequencing`) | ✅ v0.1 |
 | MES (generic) | `@PCP/adapter-mes` | 📋 Planned |
 | LIMS (generic) | `@PCP/adapter-lims` | 📋 Planned |
 | ERPNext | `@PCP/adapter-erpnext` | 📋 Planned |

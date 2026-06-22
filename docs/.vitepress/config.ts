@@ -120,8 +120,8 @@ const enSidebar = {
       items: [
         { text: 'Overview', link: '/adapters/overview' },
         { text: 'HAE PostgreSQL', link: '/adapters/hae-postgres' },
+        { text: 'Production Sequencing', link: '/adapters/production-sequencing' },
         { text: 'SAP S/4HANA', link: '/adapters/sap-s4' },
-        { text: 'SAP ECC / PP/DS', link: '/adapters/sap-ecc' },
         { text: 'MES', link: '/adapters/mes' },
         { text: 'LIMS', link: '/adapters/lims' },
         { text: 'ERPNext', link: '/adapters/erpnext' },
@@ -241,6 +241,7 @@ const deSidebar = {
       items: [
         { text: 'Übersicht', link: '/de/adapters/overview' },
         { text: 'HAE PostgreSQL', link: '/de/adapters/hae-postgres' },
+        { text: 'Production Sequencing', link: '/de/adapters/production-sequencing' },
         { text: 'SAP S/4HANA', link: '/de/adapters/sap-s4' },
         { text: 'ERPNext', link: '/de/adapters/erpnext' },
         { text: 'MES', link: '/de/adapters/mes' },

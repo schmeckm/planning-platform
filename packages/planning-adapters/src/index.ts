@@ -5,3 +5,5 @@ export * from './sap/sap-s4.adapter.js';
 export * from './sap/sap-s4.odata.js';
 export * from './erpnext/erpnext.adapter.js';
 export * from './erpnext/erpnext.api.js';
+export * from './production-sequencing/production-sequencing.adapter.js';
+export * from './production-sequencing/production-sequencing.api.js';

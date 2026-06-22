@@ -18,6 +18,7 @@ Live-Telemetrie über MQTT ist im [Shopfloor-Transparenz-Modul](/de/modules/shop
 | CSV / Excel | `@PCP/adapter-csv` | ✅ Verfügbar |
 | MES (Live MQTT) | `@PCP/planning-shopfloor` | ✅ Referenzimplementierung — siehe [Shopfloor-Modul](/de/modules/shopfloor) |
 | SAP S/4HANA | `@PCP/adapter-sap-s4` | 🚧 In Entwicklung |
+| Production Sequencing | `@PCP/planning-adapters` (`production.sequencing`) | ✅ v0.1 |
 | MES (generisch, Stammdaten) | `@PCP/adapter-mes` | 📋 Geplant |
 
 Vollständige englische Übersicht: [Adapters Overview](/adapters/overview)

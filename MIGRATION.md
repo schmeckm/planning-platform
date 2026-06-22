@@ -217,4 +217,4 @@ Optional offen: `git filter-repo` für saubere History im Standalone-Repo (ohne 
 
 Commits (OPP): `8071a7b` … `9b71a3c` · HAE submodule bumps: `ac5d334` … `ab62837`
 
-**Nächste Schritte (Phase 2):** TRIC / cleaning matrix constraints, SAP PP/DS fixture, OPP ↔ OR-Tools bridge.
+**Nächste Schritte (Phase 2):** OPP ↔ OR-Tools bridge; Production Sequencing adapter (`production.sequencing`) ✅.

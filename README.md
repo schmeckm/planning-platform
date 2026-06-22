@@ -363,7 +363,7 @@ Migrationslog: [MIGRATION.md](MIGRATION.md)
 - [x] Constraint Explorer with self-test runner (`POST /constraints/self-test`)
 - [x] Docker Compose (Postgres host port **5433**, Redis, backend)
 
-### Phase 2 — in progress (8/9 constraint items done)
+### Phase 2 — complete (9/9)
 
 - [x] PostgreSQL persistence layer (OPP shadow store: `pcp_*` tables)
 - [x] HAE PostgreSQL adapter (`hae.postgres` — read-only `hap_*` bridge)
@@ -374,7 +374,7 @@ Migrationslog: [MIGRATION.md](MIGRATION.md)
 - [x] QA inspection lot status constraint
 - [x] Cryogenic storage capacity constraint (CGT)
 - [x] Courier/shipment window constraint (CGT)
-- [ ] SAP PP/DS adapter (sequence-dependent setup, pegging)
+- [x] Production Sequencing adapter (sequence-dependent setup, pegging) — `production.sequencing`
 
 ### Phase 3 — planned
 

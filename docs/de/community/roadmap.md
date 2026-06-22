@@ -17,7 +17,7 @@ Kernmodell, Constraint-Plugins, Mock-Adapter, REST/Swagger, Vue-Board, Docker, C
 
 ### Als Nächstes
 
-- [ ] SAP PP/DS Adapter
+- [x] Production Sequencing Adapter — `production.sequencing`
 - [ ] MES-Adapter-Interface
 - [ ] Multi-Objective-Optimierung / AI-Erklärungslayer
 
