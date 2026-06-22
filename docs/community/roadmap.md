@@ -25,7 +25,7 @@
 - [x] SAP S/4HANA adapter v0.2 (`sap.s4hana` — fixture + OData production orders, work centers, materials, batches, stock)
 - [ ] SAP PP/DS adapter (sequence-dependent setup matrices, pegging)
 - [ ] Generic MES adapter interface ([reference: Shopfloor MQTT module](/modules/shopfloor))
-- [ ] ERPNext adapter
+- [x] ERPNext adapter v0.1 (`erpnext` — fixture + Frappe REST API)
 - [ ] Constraint scoring & multi-objective optimization
 - [ ] AI knowledge layer ("Why was this order blocked?" — natural language)
 - [ ] Community constraint registry (discover constraints from the community)

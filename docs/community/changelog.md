@@ -24,7 +24,9 @@ For readable release stories, see [Release Notes](/community/release-notes/).
 ### Added
 
 - SAP S/4HANA adapter v0.2 (`sap.s4hana`) — fixture demo mode + OData live mode for orders, work centers, materials, batches, stock
-- `@PCP/planning-adapters` tests for SAP fixture adapter (8 tests)
+- ERPNext adapter v0.1 (`erpnext`) — fixture demo mode + Frappe REST API for Work Orders, Workstations, Items, Batches, Bin
+- `pnpm --filter @PCP/planning-adapters verify:sap` — SAP OData connectivity check
+- `@PCP/planning-adapters` tests for SAP and ERPNext fixture adapters (14 tests)
 
 ### Added (prior unreleased)
 - `pnpm --filter @PCP/backend db:migrate` and `db:seed` (supports `--adapter=mock.pharma|hae.postgres`)

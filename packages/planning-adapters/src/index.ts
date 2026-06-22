@@ -3,3 +3,5 @@ export * from './adapters/mock.adapter.js';
 export * from './adapters/hae.adapter.js';
 export * from './sap/sap-s4.adapter.js';
 export * from './sap/sap-s4.odata.js';
+export * from './erpnext/erpnext.adapter.js';
+export * from './erpnext/erpnext.api.js';

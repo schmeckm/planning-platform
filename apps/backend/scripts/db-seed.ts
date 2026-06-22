@@ -7,7 +7,7 @@
  */
 
 import { PostgresPlanningStore } from '@PCP/planning-core';
-import { MockPharmaAdapter, createHaeAdapter, createSapS4Adapter } from '@PCP/planning-adapters';
+import { MockPharmaAdapter, createHaeAdapter, createSapS4Adapter, createErpNextAdapter } from '@PCP/planning-adapters';
 import type { IPlanningAdapter } from '@PCP/planning-adapters';
 
 function resolveOppDatabaseUrl(): string {
@@ -31,8 +31,10 @@ function resolveAdapter(adapterId: string): IPlanningAdapter {
       return createHaeAdapter();
     case 'sap.s4hana':
       return createSapS4Adapter();
+    case 'erpnext':
+      return createErpNextAdapter();
     default:
-      throw new Error(`Unknown adapter "${adapterId}". Use mock.pharma, hae.postgres, or sap.s4hana.`);
+      throw new Error(`Unknown adapter "${adapterId}". Use mock.pharma, hae.postgres, sap.s4hana, or erpnext.`);
   }
 }
 

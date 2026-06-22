@@ -1,0 +1,95 @@
+import type {
+  ErpNextWorkOrder,
+  ErpNextWorkstation,
+  ErpNextItem,
+  ErpNextBatch,
+  ErpNextBin,
+} from './erpnext.types.js';
+
+export const ERPNEXT_FIXTURES = {
+  company: 'Pharma Collective GmbH',
+  workOrders: [
+    {
+      name: 'WO-2026-00042',
+      production_item: 'TAB-ASPIRIN-500MG',
+      qty: 120000,
+      stock_uom: 'Nos',
+      status: 'Not Started',
+      planned_start_date: '2026-07-01',
+      planned_end_date: '2026-07-18',
+      company: 'Pharma Collective GmbH',
+      priority: 'High',
+      operations: [
+        { operation: 'Granulation', workstation: 'WS-GRAN-01', time_in_mins: 360, idx: 1 },
+        { operation: 'Compression', workstation: 'WS-TAB-01', time_in_mins: 480, idx: 2 },
+        { operation: 'Coating', workstation: 'WS-COAT-01', time_in_mins: 300, idx: 3 },
+      ],
+    },
+    {
+      name: 'WO-2026-00043',
+      production_item: 'SUSP-IBUPROFEN-200',
+      qty: 50000,
+      stock_uom: 'Nos',
+      status: 'In Process',
+      planned_start_date: '2026-06-20',
+      planned_end_date: '2026-07-05',
+      company: 'Pharma Collective GmbH',
+      priority: 'Medium',
+      operations: [
+        { operation: 'Mixing', workstation: 'WS-MIX-02', time_in_mins: 240, idx: 1 },
+        { operation: 'Filling', workstation: 'WS-FILL-01', time_in_mins: 420, idx: 2 },
+      ],
+    },
+    {
+      name: 'WO-2026-00044',
+      production_item: 'API-PARACETAMOL',
+      qty: 2500,
+      stock_uom: 'Kg',
+      status: 'Draft',
+      planned_start_date: '2026-08-01',
+      planned_end_date: '2026-08-15',
+      company: 'Pharma Collective GmbH',
+      operations: [
+        { operation: 'Crystallization', workstation: 'WS-REACT-01', time_in_mins: 600, idx: 1 },
+      ],
+    },
+  ] satisfies ErpNextWorkOrder[],
+  workstations: [
+    { name: 'WS-GRAN-01', workstation_name: 'Granulation Line 1', production_capacity: 1 },
+    { name: 'WS-TAB-01', workstation_name: 'Tablet Press 1', production_capacity: 1 },
+    { name: 'WS-COAT-01', workstation_name: 'Coating Line 1', production_capacity: 1 },
+    { name: 'WS-MIX-02', workstation_name: 'Suspension Mixer 2', production_capacity: 1 },
+    { name: 'WS-FILL-01', workstation_name: 'Liquid Filling Line 1', production_capacity: 1 },
+    { name: 'WS-REACT-01', workstation_name: 'API Reactor 1', production_capacity: 1 },
+  ] satisfies ErpNextWorkstation[],
+  items: [
+    { name: 'TAB-ASPIRIN-500MG', item_name: 'Aspirin 500mg Tablets', stock_uom: 'Nos', shelf_life_in_days: 730, has_batch_no: 1 },
+    { name: 'SUSP-IBUPROFEN-200', item_name: 'Ibuprofen Suspension 200mg/5ml', stock_uom: 'Nos', shelf_life_in_days: 540, has_batch_no: 1 },
+    { name: 'API-PARACETAMOL', item_name: 'Paracetamol API', stock_uom: 'Kg', shelf_life_in_days: 365, has_batch_no: 1 },
+  ] satisfies ErpNextItem[],
+  batches: [
+    {
+      name: 'BATCH-ERP-2026-001',
+      batch_id: 'BATCH-ERP-2026-001',
+      item: 'TAB-ASPIRIN-500MG',
+      batch_qty: 95000,
+      stock_uom: 'Nos',
+      manufacturing_date: '2026-05-15',
+      expiry_date: '2028-05-14',
+    },
+    {
+      name: 'BATCH-ERP-2026-HOLD',
+      batch_id: 'BATCH-ERP-2026-HOLD',
+      item: 'SUSP-IBUPROFEN-200',
+      batch_qty: 12000,
+      stock_uom: 'Nos',
+      manufacturing_date: '2026-06-01',
+      expiry_date: '2027-12-01',
+    },
+  ] satisfies ErpNextBatch[],
+  bins: [
+    { item_code: 'TAB-ASPIRIN-500MG', warehouse: 'Finished Goods - PCG', actual_qty: 110000, stock_uom: 'Nos' },
+    { item_code: 'SUSP-IBUPROFEN-200', warehouse: 'Finished Goods - PCG', actual_qty: 35000, stock_uom: 'Nos' },
+    { item_code: 'API-PARACETAMOL', warehouse: 'Stores - PCG', actual_qty: 4200, stock_uom: 'Kg' },
+  ] satisfies ErpNextBin[],
+};
