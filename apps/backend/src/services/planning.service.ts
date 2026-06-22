@@ -7,6 +7,10 @@
  * This is the main entry point for the API layer.
  */
 
+import { loadBackendEnv } from '../../scripts/load-backend-env.mjs';
+
+loadBackendEnv({ override: process.env['NODE_ENV'] !== 'production' });
+
 import {
   InMemoryOrderRepository,
   InMemoryResourceRepository,
