@@ -25,8 +25,8 @@ The Pharma Collective Platform applies the same principle to manufacturing plann
 └────────────────┘ └────────────────┘ └────────────────┘
          ↑ Adapter Interface (IPlanningAdapter)
 ┌────────────────┐ ┌────────────────┐ ┌────────────────┐
-│ ERP Adapter    │ │ ERPNext        │ │ CSV / Mock     │
-│ (planned)      │ │ Adapter        │ │ Adapter        │
+│ SAP S/4HANA    │ │ ERPNext        │ │ Mock / HAE     │
+│ Adapter v0.2   │ │ Adapter v0.1   │ │ Adapters       │
 └────────────────┘ └────────────────┘ └────────────────┘
 ```
 
@@ -94,7 +94,12 @@ Then open:
 ### Docker Mode
 
 ```bash
-# OPP core (backend + postgres + redis) — no Cockpit/Portal required
+# OPP Postgres uses host port 5433 (avoids conflict with HAE Postgres on 5432)
+cp apps/backend/.env.example apps/backend/.env
+docker compose up -d postgres redis
+pnpm --filter @PCP/backend db:migrate
+pnpm --filter @PCP/backend db:seed
+
 pnpm install
 pnpm --filter @PCP/backend... build
 docker compose up -d
@@ -335,35 +340,43 @@ Migrationslog: [MIGRATION.md](MIGRATION.md)
 
 ## Roadmap
 
-### MVP (Current)
+> Detailed roadmap: [docs/community/roadmap.md](docs/community/roadmap.md) · Changelog: [docs/community/changelog.md](docs/community/changelog.md)  
+> **Stand:** 2026-06-22 · Spur B (PostgreSQL + ERP adapters + HAE bridge) largely complete.
+
+### MVP ✓ completed
+
 - [x] Canonical data model
 - [x] Constraint plugin interface
 - [x] ATP, Resource Capacity, RMSL constraints
 - [x] GMP Batch Release, Hold Time constraints (Pharma Pack)
 - [x] Chain of Identity, Vein-to-Vein constraints (CGT Pack)
 - [x] Mock adapter with realistic pharma + CGT data
-- [x] SAP S/4HANA adapter stub
-- [x] REST API with Swagger
+- [x] SAP S/4HANA adapter v0.2 (fixture demo + OData live mode)
+- [x] REST API with Swagger (`/api/pcp/v1/*`, port 3100)
 - [x] Vue.js scheduling board with swimlane + timeline view
-- [x] Constraint Explorer with self-test runner
-- [x] Docker Compose
+- [x] Constraint Explorer with self-test runner (`POST /constraints/self-test`)
+- [x] Docker Compose (Postgres host port **5433**, Redis, backend)
 
-### Phase 2
-- [ ] PostgreSQL persistence layer
+### Phase 2 — in progress (3/9 done)
+
+- [x] PostgreSQL persistence layer (OPP shadow store: `pcp_*` tables)
+- [x] HAE PostgreSQL adapter (`hae.postgres` — read-only `hap_*` bridge)
+- [x] ERPNext adapter v0.1 (fixture + Frappe REST API)
 - [ ] Cleaning validation matrix constraint
 - [ ] Campaign sequencing constraint
 - [ ] Country/batch release check (TRIC)
 - [ ] QA inspection lot status constraint
-- [ ] ERPNext adapter
 - [ ] Cryogenic storage capacity constraint (CGT)
 - [ ] Courier/shipment window constraint (CGT)
+- [ ] SAP PP/DS adapter (sequence-dependent setup, pegging)
 
-### Phase 3
-- [ ] CP-SAT solver integration (Python OR-Tools)
+### Phase 3 — planned
+
+- [ ] CP-SAT solver integration in OPP (HAE OR-Tools sidecar on `:8010` exists; OPP bridge pending)
 - [ ] AI knowledge layer (pgvector + SOP retrieval)
 - [ ] Neo4j knowledge graph for constraint explanations
 - [ ] Community contribution templates
-- [x] GitHub Actions CI for plugin validation
+- [x] GitHub Actions CI for plugin validation (`planning-platform-ci.yml`, simulation tests, export smoke)
 
 ---
 

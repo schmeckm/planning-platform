@@ -9,7 +9,7 @@ Diese Anleitung führt durch die lokale Installation der Pharma Collective Platf
 | Node.js | 20.x | Backend & Tooling |
 | pnpm | 9.x | Monorepo-Paketmanager |
 | Docker & Docker Compose | 24.x | PostgreSQL + Redis |
-| Python | 3.11+ | CP-SAT-Solver-Worker (optional) |
+| Python | 3.11+ | CP-SAT-Solver (optional, HAE-Stack) |
 
 ## Installation
 
@@ -35,29 +35,44 @@ cd planningplatform/open-planning-platform
 pnpm install
 ```
 
-Installiert alle Pakete des Monorepo-Workspaces gleichzeitig.
-
-### 3. Infrastruktur starten
-
-```bash
-docker compose up -d
-```
-
-Startet:
-- **PostgreSQL** auf Port `5432` — transaktionale Planungsdaten
-- **Redis** auf Port `6379` — Job-Queue und Live-Planungs-Cache
-
-### 4. Datenbank initialisieren
+### 3. Umgebung konfigurieren
 
 ```bash
 cp apps/backend/.env.example apps/backend/.env
+```
+
+Wichtige Variablen in `apps/backend/.env`:
+
+| Variable | Zweck |
+|---|---|
+| `PCP_DATABASE_URL` | OPP-Shadow-DB (`pcp_*`) — Standard `127.0.0.1:5433` |
+| `ALLOCATION_DATABASE_URL` | HAE-Read-Adapter (`hae.postgres`) — optional, z. B. `127.0.0.1:5432/hap` |
+
+Skripte (`db:migrate`, `db:seed`, `dev`) laden diese Datei automatisch.
+
+### 4. Infrastruktur starten
+
+```bash
+docker compose up -d postgres redis
+```
+
+Startet:
+
+- **PostgreSQL** auf Host-Port **5433** (Container 5432) — kein Konflikt mit HAE-Postgres auf 5432
+- **Redis** auf Port **6379**
+
+> Unter Windows `127.0.0.1` statt `localhost` in DB-URLs verwenden (IPv6-Routing).
+
+### 5. Datenbank initialisieren
+
+```bash
 pnpm --filter @PCP/backend db:migrate
 pnpm --filter @PCP/backend db:seed
 # optional:
 pnpm --filter @PCP/backend verify:persistence
 ```
 
-Der Seed-Befehl lädt Pharma-Beispieldaten in die **OPP-Shadow-Datenbank** (`PCP_DATABASE_URL`).
+Der Seed-Befehl lädt Mock-Pharma-Daten in die **OPP-Shadow-Datenbank**.
 
 Aus der HAE-Werksdatenbank laden (benötigt `ALLOCATION_DATABASE_URL`):
 
@@ -65,25 +80,28 @@ Aus der HAE-Werksdatenbank laden (benötigt `ALLOCATION_DATABASE_URL`):
 pnpm --filter @PCP/backend db:seed -- --adapter=hae.postgres
 ```
 
-### 5. API starten
+### 6. API starten
 
 ```bash
 pnpm --filter @PCP/backend dev
 ```
 
-Die API läuft auf `http://localhost:3000`. Die Swagger-Oberfläche ist unter `http://localhost:3000/api-docs` erreichbar.
+- API: `http://127.0.0.1:3100/api/pcp/v1/health`
+- Swagger: `http://127.0.0.1:3100/docs`
 
-### 6. Frontend starten (optional)
+Typische Adapter: `mock.pharma`, `sap.s4hana`, `erpnext`, plus `hae.postgres` wenn `ALLOCATION_DATABASE_URL` gesetzt ist.
+
+### 7. Frontend starten (optional)
 
 ```bash
 pnpm --filter @PCP/frontend dev
 ```
 
-Das Planungsboard läuft auf `http://localhost:5173`.
+Planungsboard: `http://localhost:5173` (HAE-Monorepo-Pfade oder `vendor/`-Sync für Embedded-Modus).
 
-### 7. Shopfloor-Linien-Transparenz (optional)
+### 8. Shopfloor-Linien-Transparenz (optional)
 
-Mit dem vollständigen **Hard Allocation Engine (HAE)**-Stack neben OPP steht Live-Einblick in Verpackungslinien über MQTT bereit — dieselben Views wie im legacy Portal:
+Mit dem vollständigen **Hard Allocation Engine (HAE)**-Stack neben OPP:
 
 | View | Route | Zweck |
 |------|-------|--------|
@@ -92,109 +110,87 @@ Mit dem vollständigen **Hard Allocation Engine (HAE)**-Stack neben OPP steht Li
 
 **Voraussetzungen:**
 
-1. HAE Allocation API auf Port **8000** (MQTT-Ingest startet mit dem Server)
-2. OPP API auf Port **3100** (Proxy für `/api/v1/shopfloor/*` → HAE)
-3. Umgebungsvariablen am HAE-Backend:
+1. HAE Allocation API auf Port **8000** (`/health`)
+2. OPP API auf Port **3100** (Shopfloor-Proxy → HAE)
+3. Optional MQTT-Env am HAE-Backend
 
 ```bash
-MQTT_ENABLED=true
-MQTT_BROKER_URL=mqtt://localhost:1883
-MQTT_NAMESPACE=hap/pharma
+curl http://127.0.0.1:3100/api/pcp/v1/shopfloor/module
 ```
 
-**Shopfloor-Modul prüfen:**
-
-```bash
-curl http://localhost:3100/api/pcp/v1/shopfloor/module
-curl http://localhost:3100/api/pcp/v1/shopfloor/board
-```
-
-Vollständige Dokumentation: [Shopfloor-Transparenz-Modul](/de/modules/shopfloor).
+Dokumentation: [Shopfloor-Transparenz-Modul](/de/modules/shopfloor).
 
 ## Installation prüfen
 
-Erste Constraint-Auswertung starten:
+```bash
+curl http://127.0.0.1:3100/api/pcp/v1/health
+
+curl -X POST http://127.0.0.1:3100/api/pcp/v1/simulations/load-adapter \
+  -H "Content-Type: application/json" \
+  -d '{ "adapterId": "mock.pharma" }'
+
+curl -X POST http://127.0.0.1:3100/api/pcp/v1/simulations \
+  -H "Content-Type: application/json" \
+  -d '{ "name": "Erste Simulation", "triggeredBy": "planner" }'
+
+curl -X POST http://127.0.0.1:3100/api/pcp/v1/constraints/self-test
+```
+
+Erwartete Demo-Ergebnisse (mock.pharma): `ORD-PH-001` FEASIBLE, `ORD-PH-002` INFEASIBLE (QA_HOLD).
+
+### HAE-Integration (Monorepo)
+
+Mit laufendem HAE-Postgres und `ALLOCATION_DATABASE_URL` in `.env`:
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/simulations \
+curl -X POST http://127.0.0.1:3100/api/pcp/v1/simulations/load-adapter \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "Erster Simulationslauf",
-    "orders": ["ORD-001", "ORD-002", "ORD-003"],
-    "constraints": ["atp-check", "resource-capacity", "hold-time"]
-  }'
+  -d '{ "adapterId": "hae.postgres" }'
 ```
 
-Die Antwort enthält Constraint-Auswertungen:
-
-```json
-{
-  "simulationId": "sim-abc123",
-  "status": "COMPLETED",
-  "results": [
-    {
-      "orderId": "ORD-001",
-      "feasible": true,
-      "constraints": [
-        { "id": "atp-check", "severity": "OK" },
-        { "id": "resource-capacity", "severity": "WARNING",
-          "message": "R-04 zu 94% ausgelastet" }
-      ]
-    }
-  ]
-}
-```
+→ [HAE PostgreSQL Adapter](/de/adapters/hae-postgres)
 
 ## Projektstruktur
 
 ```
-planningplatform/
-├── open-planning-platform/
-│   ├── packages/
-│   │   ├── planning-core/        # Kanonisches Datenmodell & Domain-Typen
-│   │   ├── planning-constraints/ # Plugin-Interface & Constraint-Engine
-│   │   ├── planning-pharma/      # Pharma-Industrie-Pack
-│   │   ├── planning-cgt/         # Cell & Gene Therapy Pack
-│   │   ├── planning-adapters/    # ERP/MES-Adapter-Interfaces
-│   │   └── planning-shopfloor/   # Live-Linien-Transparenz (MQTT + Board)
-│   ├── apps/
-│   │   ├── api/                  # Express REST API
-│   │   ├── web/                  # Vue.js Planungsboard
-│   │   └── docs/                 # Diese Dokumentationsseite
-│   └── docs/                     # Architektur- & Design-Dokumente
-├── portal/                       # Platform-Portal (Landing, Auth)
-└── cockpit/                      # Planungs-Cockpit UI
+planning-platform/                 # Standalone OPP-Repo
+├── packages/                      # Kernel, Constraints, Adapter
+├── apps/backend/                  # REST API (:3100)
+├── apps/frontend/                 # Vue-Planungsboard (:5173)
+└── docs/                          # VitePress
 ```
+
+Im HAE-Monorepo liegt der gleiche Baum unter `open-planning-platform/` als Git-Submodule.
 
 ## Nächste Schritte
 
-- [Architektur verstehen](/de/guide/architecture) — wie die Pakete zusammenhängen
-- [Ersten Constraint schreiben](/de/constraints/writing) — eigene Planungsregel hinzufügen
-- [Industrie-Packs durchsuchen](/de/industries/pharma) — vorgefertigte Pharma-Constraints nutzen
-- [System anbinden](/de/adapters/overview) — ERP/MES-Daten ins kanonische Modell mappen
-- [Shopfloor-Linien-Transparenz](/de/modules/shopfloor) — Live-MQTT-Ingest, Linien-Board und Admin-UI
+- [Roadmap](/de/community/roadmap)
+- [Architektur](/de/guide/architecture)
+- [SAP S/4HANA Adapter](/de/adapters/sap-s4) · [ERPNext](/de/adapters/erpnext) · [HAE Postgres](/de/adapters/hae-postgres)
 
 ## Fehlerbehebung
 
-**`pnpm install` schlägt unter Windows fehl**
+**Port 5432 bereits belegt**
 
-pnpm global installieren:
-```bash
-npm install -g pnpm
+OPP-Docker-Postgres nutzt Host-Port **5433**. `PCP_DATABASE_URL=...@127.0.0.1:5433/opp`.
+
+**`db:migrate`: `PCP_DATABASE_URL` fehlt**
+
+`apps/backend/.env.example` → `.env` kopieren.
+
+**`hae.postgres` fehlt in `/health`**
+
+`ALLOCATION_DATABASE_URL` in `.env` setzen und Backend neu starten.
+
+**Veraltete Shell-Variablen**
+
+```powershell
+Remove-Item Env:PCP_DATABASE_URL, Env:JWT_SECRET -ErrorAction SilentlyContinue
 ```
 
-**Docker-Container starten nicht**
+**Docker startet nicht**
 
-Prüfen, ob die Ports 5432 und 6379 bereits belegt sind:
 ```bash
 docker compose ps
 docker compose logs postgres
-```
-
-**Seed-Daten werden nicht geladen**
-
-Migration zuerst ausführen:
-```bash
-pnpm --filter @PCP/backend db:migrate
-pnpm --filter @PCP/backend db:seed
 ```

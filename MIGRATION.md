@@ -1,7 +1,7 @@
 # Migration Log — open-planning-platform
 
 Technische Umstrukturierung ohne fachliche Logikänderung.  
-Stand: 2026-06-22 · PR 1–10 abgeschlossen
+Stand: 2026-06-22 · PR 1–13 (Spur B) abgeschlossen
 
 ## Zielbild (Standalone-Repo)
 
@@ -197,3 +197,24 @@ Optional offen: `git filter-repo` für saubere History im Standalone-Repo (ohne 
 | README / IT.md | Portal als Quick-Start-Default |
 
 **Strategie:** Shell-Migration abgeschlossen; Feature-Code in `cockpit/` wird wellenweise nach `portal/` bzw. OPP überführt. Siehe [docs/FEATURE-MIGRATION.md](../docs/FEATURE-MIGRATION.md).
+
+---
+
+## PR 13 — Spur B: PostgreSQL, ERP-Adapter, HAE-Bridge ✓ (2026-06-22)
+
+| Änderung | Beschreibung |
+|----------|--------------|
+| `PostgresPlanningStore` | OPP shadow persistence (`pcp_*` JSONB tables) |
+| `db:migrate` / `db:seed` / `verify:persistence` | Backend scripts; auto-load `apps/backend/.env` |
+| `load-backend-env.mjs` | Shared env loader for scripts + dev server |
+| Docker Compose | Postgres host port **5433** (HAE keeps 5432) |
+| `sap.s4hana` v0.2 | Fixture + OData live mode |
+| `erpnext` v0.1 | Fixture + Frappe REST API |
+| `hae.postgres` | Read-only HAE `hap_*` adapter; end-to-end verified |
+| `planning.service.ts` | Load `.env` before singleton (HAE adapter registration) |
+| CI | Postgres integration tests in `planning-platform-ci.yml` |
+| Docs | Roadmap, getting started, changelog, HAE adapter guide updated |
+
+Commits (OPP): `8071a7b` … `9b71a3c` · HAE submodule bumps: `ac5d334` … `ab62837`
+
+**Nächste Schritte (Phase 2):** TRIC / cleaning matrix constraints, SAP PP/DS fixture, OPP ↔ OR-Tools bridge.

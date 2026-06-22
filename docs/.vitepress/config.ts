@@ -119,6 +119,7 @@ const enSidebar = {
       text: 'Adapters',
       items: [
         { text: 'Overview', link: '/adapters/overview' },
+        { text: 'HAE PostgreSQL', link: '/adapters/hae-postgres' },
         { text: 'SAP S/4HANA', link: '/adapters/sap-s4' },
         { text: 'SAP ECC / PP/DS', link: '/adapters/sap-ecc' },
         { text: 'MES', link: '/adapters/mes' },
@@ -239,7 +240,9 @@ const deSidebar = {
       text: 'Adapter',
       items: [
         { text: 'Übersicht', link: '/de/adapters/overview' },
+        { text: 'HAE PostgreSQL', link: '/de/adapters/hae-postgres' },
         { text: 'SAP S/4HANA', link: '/de/adapters/sap-s4' },
+        { text: 'ERPNext', link: '/de/adapters/erpnext' },
         { text: 'MES', link: '/de/adapters/mes' },
         { text: 'LIMS', link: '/de/adapters/lims' },
         { text: 'CSV / Excel', link: '/de/adapters/csv' },

@@ -9,7 +9,7 @@ This guide walks you through setting up Pharma Collective Platform locally in ab
 | Node.js | 20.x | Backend & tooling |
 | pnpm | 9.x | Monorepo package manager |
 | Docker & Docker Compose | 24.x | PostgreSQL + Redis |
-| Python | 3.11+ | CP-SAT solver worker (optional) |
+| Python | 3.11+ | CP-SAT solver worker (optional, HAE stack) |
 
 ## Installation
 
@@ -35,29 +35,44 @@ cd planningplatform/open-planning-platform
 pnpm install
 ```
 
-This installs all packages in the monorepo workspace simultaneously.
-
-### 3. Start Infrastructure
-
-```bash
-docker compose up -d
-```
-
-This starts:
-- **PostgreSQL** on port `5432` — transactional planning data
-- **Redis** on port `6379` — job queue and live planning cache
-
-### 4. Initialize the Database
+### 3. Configure environment
 
 ```bash
 cp apps/backend/.env.example apps/backend/.env
+```
+
+Key variables in `apps/backend/.env`:
+
+| Variable | Purpose |
+|---|---|
+| `PCP_DATABASE_URL` | OPP shadow database (`pcp_*` tables) — default `127.0.0.1:5433` |
+| `ALLOCATION_DATABASE_URL` | HAE read adapter (`hae.postgres`) — optional, e.g. `127.0.0.1:5432/hap` |
+
+Scripts (`db:migrate`, `db:seed`, `dev`) auto-load this file.
+
+### 4. Start Infrastructure
+
+```bash
+docker compose up -d postgres redis
+```
+
+This starts:
+
+- **PostgreSQL** on host port **5433** (container 5432) — avoids conflict with HAE Postgres on 5432
+- **Redis** on port **6379**
+
+> On Windows, use `127.0.0.1` in database URLs instead of `localhost` (IPv6 routing).
+
+### 5. Initialize the Database
+
+```bash
 pnpm --filter @PCP/backend db:migrate
 pnpm --filter @PCP/backend db:seed
 # optional verification:
 pnpm --filter @PCP/backend verify:persistence
 ```
 
-The seed command loads sample pharma mock data into the **OPP shadow database** (`PCP_DATABASE_URL`).
+The seed command loads mock pharma data into the **OPP shadow database**.
 
 To load from the HAE plant database instead (requires `ALLOCATION_DATABASE_URL`):
 
@@ -65,25 +80,28 @@ To load from the HAE plant database instead (requires `ALLOCATION_DATABASE_URL`)
 pnpm --filter @PCP/backend db:seed -- --adapter=hae.postgres
 ```
 
-### 5. Start the API
+### 6. Start the API
 
 ```bash
 pnpm --filter @PCP/backend dev
 ```
 
-API runs at `http://localhost:3000`. Swagger UI is available at `http://localhost:3000/api-docs`.
+- API: `http://127.0.0.1:3100/api/pcp/v1/health`
+- Swagger: `http://127.0.0.1:3100/docs`
 
-### 6. Start the Frontend (optional)
+Registered adapters (typical): `mock.pharma`, `sap.s4hana`, `erpnext`, and `hae.postgres` when `ALLOCATION_DATABASE_URL` is set.
+
+### 7. Start the Frontend (optional)
 
 ```bash
 pnpm --filter @PCP/frontend dev
 ```
 
-Scheduling board runs at `http://localhost:5173`.
+Scheduling board: `http://localhost:5173` (requires HAE monorepo paths or `vendor/` sync for embedded mode).
 
-### 7. Shopfloor line transparency (optional)
+### 8. Shopfloor line transparency (optional)
 
-When running the full **Hard Allocation Engine (HAE)** stack alongside OPP, you get live packaging-line visibility via MQTT — the same views as the legacy portal:
+When running the full **Hard Allocation Engine (HAE)** stack alongside OPP:
 
 | View | Route | Purpose |
 |------|-------|---------|
@@ -92,99 +110,98 @@ When running the full **Hard Allocation Engine (HAE)** stack alongside OPP, you 
 
 **Requirements:**
 
-1. HAE allocation API on port **8000** (MQTT ingest starts with the server)
-2. OPP API on port **3100** (proxies `/api/v1/shopfloor/*` to HAE)
-3. Environment variables on the HAE backend:
+1. HAE allocation API on port **8000** (`/health`)
+2. OPP API on port **3100** (proxies shopfloor routes to HAE)
+3. Optional MQTT env on HAE: `MQTT_ENABLED`, `MQTT_BROKER_URL`, `MQTT_NAMESPACE`
 
 ```bash
-MQTT_ENABLED=true
-MQTT_BROKER_URL=mqtt://localhost:1883
-MQTT_NAMESPACE=hap/pharma
-```
-
-**Verify the shopfloor module:**
-
-```bash
-curl http://localhost:3100/api/pcp/v1/shopfloor/module
-curl http://localhost:3100/api/pcp/v1/shopfloor/board
+curl http://127.0.0.1:3100/api/pcp/v1/shopfloor/module
 ```
 
 Full documentation: [Shopfloor Transparency Module](/modules/shopfloor).
 
 ## Verify the Installation
 
-Run your first constraint evaluation:
+```bash
+# Health
+curl http://127.0.0.1:3100/api/pcp/v1/health
+
+# Load demo data
+curl -X POST http://127.0.0.1:3100/api/pcp/v1/simulations/load-adapter \
+  -H "Content-Type: application/json" \
+  -d '{ "adapterId": "mock.pharma" }'
+
+# Run constraint evaluation (7 plugins)
+curl -X POST http://127.0.0.1:3100/api/pcp/v1/simulations \
+  -H "Content-Type: application/json" \
+  -d '{ "name": "First simulation", "triggeredBy": "planner" }'
+
+# Constraint self-tests
+curl -X POST http://127.0.0.1:3100/api/pcp/v1/constraints/self-test
+```
+
+Expected demo outcomes (mock.pharma): `ORD-PH-001` FEASIBLE, `ORD-PH-002` INFEASIBLE (QA_HOLD), capacity blockers on other orders.
+
+### HAE integration (monorepo)
+
+With HAE Postgres running and `ALLOCATION_DATABASE_URL` in `.env`:
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/simulations \
+curl -X POST http://127.0.0.1:3100/api/pcp/v1/simulations/load-adapter \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "First simulation",
-    "orders": ["ORD-001", "ORD-002", "ORD-003"],
-    "constraints": ["atp-check", "resource-capacity", "hold-time"]
-  }'
+  -d '{ "adapterId": "hae.postgres" }'
 ```
 
-You should receive a simulation result with constraint evaluations:
-
-```json
-{
-  "simulationId": "sim-abc123",
-  "status": "COMPLETED",
-  "results": [
-    {
-      "orderId": "ORD-001",
-      "feasible": true,
-      "constraints": [
-        { "id": "atp-check", "severity": "OK" },
-        { "id": "resource-capacity", "severity": "WARNING", "message": "R-04 at 94% utilization" }
-      ]
-    }
-  ]
-}
-```
+→ [HAE PostgreSQL Adapter](/adapters/hae-postgres)
 
 ## Project Structure
 
 ```
-planningplatform/
-├── open-planning-platform/
-│   ├── packages/
-│   │   ├── planning-core/        # Canonical data model & domain types
-│   │   ├── planning-constraints/ # Plugin interface & constraint engine
-│   │   ├── planning-pharma/      # Pharma industry pack
-│   │   ├── planning-cgt/         # Cell & Gene Therapy pack
-│   │   ├── planning-adapters/    # ERP/MES adapter interfaces
-│   │   └── planning-shopfloor/   # Live line transparency (MQTT ingest + board)
-│   ├── apps/
-│   │   ├── api/                  # Express REST API
-│   │   ├── web/                  # Vue.js scheduling board
-│   │   └── docs/                 # This documentation site
-│   └── docs/                     # Architecture & design docs
-├── portal/                       # Platform portal (landing, auth)
-└── cockpit/                      # Planning cockpit UI
+planning-platform/                 # Standalone OPP repo
+├── packages/
+│   ├── planning-core/             # Canonical data model
+│   ├── planning-constraints/      # Plugin framework
+│   ├── planning-pharma/           # Pharma pack
+│   ├── planning-cgt/              # CGT pack
+│   ├── planning-adapters/         # ERP/MES adapters
+│   └── planning-shopfloor/      # MQTT line transparency
+├── apps/
+│   ├── backend/                   # Express REST API (:3100)
+│   └── frontend/                  # Vue scheduling board (:5173)
+├── docs/                          # VitePress site
+└── docker/postgres/init.sql
 ```
+
+In the HAE monorepo, the same tree lives under `open-planning-platform/` as a Git submodule.
 
 ## Next Steps
 
-- [Understand the Architecture](/guide/architecture) — how the packages relate to each other
-- [Write your first Constraint](/constraints/writing) — add a custom planning rule
-- [Browse Industry Packs](/industries/pharma) — use pre-built pharma constraints
-- [Connect an ERP](/adapters/overview) — map ERP or MES data into the canonical model
-- [Shopfloor line transparency](/modules/shopfloor) — live MQTT ingest, line board, and admin UI
+- [Roadmap](/community/roadmap) — MVP complete, Phase 2 in progress
+- [Architecture](/guide/architecture) — package relationships
+- [Write your first Constraint](/constraints/writing)
+- [SAP S/4HANA Adapter](/adapters/sap-s4) · [ERPNext](/adapters/erpnext) · [HAE Postgres](/adapters/hae-postgres)
+- [Shopfloor module](/modules/shopfloor)
 
 ## Troubleshooting
 
-**`pnpm install` fails on Windows**
+**Port 5432 already in use**
 
-Make sure you have `pnpm` installed globally:
-```bash
-npm install -g pnpm
-```
+OPP Docker Postgres maps to host port **5433**. Use `PCP_DATABASE_URL=...@127.0.0.1:5433/opp`.
+
+**`db:migrate` fails with missing `PCP_DATABASE_URL`**
+
+Copy `apps/backend/.env.example` → `apps/backend/.env`, or export the variable in your shell.
+
+**`hae.postgres` missing from `/health`**
+
+Set `ALLOCATION_DATABASE_URL` in `.env` and restart the backend (`pnpm --filter @PCP/backend dev`).
+
+**Stale shell environment variables**
+
+Remove overrides: `Remove-Item Env:PCP_DATABASE_URL, Env:JWT_SECRET -ErrorAction SilentlyContinue`
 
 **Docker containers don't start**
 
-Check that ports 5432 and 6379 are not already in use:
 ```bash
 docker compose ps
 docker compose logs postgres
@@ -192,7 +209,8 @@ docker compose logs postgres
 
 **Seed data not loading**
 
-Run the migration first before seeding:
+Run migration before seed:
+
 ```bash
 pnpm --filter @PCP/backend db:migrate
 pnpm --filter @PCP/backend db:seed
